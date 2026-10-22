@@ -1,4 +1,14 @@
-import "dotenv/config";
+try {
+  // Local and Docker development read backend/.env. Vercel and the production
+  // image inject variables and do not install this devDependency.
+  require("dotenv/config");
+} catch {
+  // Environment variables are already present.
+}
+
+if (!process.env.TZ) {
+  process.env.TZ = "Asia/Tehran";
+}
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import cookieParser from "cookie-parser";

@@ -14,9 +14,29 @@ export const envValidationSchema = Joi.object({
 
   REDIRECT_HOST: Joi.string().hostname().required(),
 
-  REDIS_HOST: Joi.string().required(),
-  REDIS_PORT: Joi.number().port().required(),
+  REDIS_URL: Joi.string().uri({ scheme: ["redis", "rediss"] }).optional(),
+  KV_URL: Joi.string().uri({ scheme: ["redis", "rediss"] }).optional(),
+  REDIS_HOST: Joi.string().when("REDIS_URL", {
+    is: Joi.exist(),
+    then: Joi.optional(),
+    otherwise: Joi.when("KV_URL", {
+      is: Joi.exist(),
+      then: Joi.optional(),
+      otherwise: Joi.required(),
+    }),
+  }),
+  REDIS_PORT: Joi.number()
+    .port()
+    .when("REDIS_URL", {
+      is: Joi.exist(),
+      then: Joi.optional(),
+      otherwise: Joi.when("KV_URL", {
+        is: Joi.exist(),
+        then: Joi.optional(),
+        otherwise: Joi.required(),
+      }),
+    }),
 
-  GEOLOCATION_TOKEN: Joi.string().required(),
+  GEOLOCATION_TOKEN: Joi.string().allow("").optional(),
   GEO_FALLBACK_IP: Joi.string().ip().default("8.8.8.8"),
 });

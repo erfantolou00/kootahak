@@ -1,26 +1,19 @@
-import { ConfigService } from "@nestjs/config";
 import { Worker } from "bullmq";
 import { PinoLogger } from "nestjs-pino";
+import { getBullMqConnection } from "../redis/redis-options";
 import { VisitData, VisitsService } from "../visits/visits.service";
 import { VISIT_WORKER } from "./visitWorker.constant";
 
 export const visitWorker = {
   provide: VISIT_WORKER,
-  useFactory: (
-    configService: ConfigService,
-    visitsService: VisitsService,
-    logger: PinoLogger,
-  ) => {
+  useFactory: (visitsService: VisitsService, logger: PinoLogger) => {
     logger.setContext("VisitWorker");
 
     const worker = new Worker<VisitData>(
       "visit",
       async (job) => visitsService.visitProcess(job.data),
       {
-        connection: {
-          host: configService.get<string>("REDIS_HOST"),
-          port: Number(configService.get<string>("REDIS_PORT")),
-        },
+        connection: getBullMqConnection(),
       },
     );
 
@@ -54,5 +47,5 @@ export const visitWorker = {
     return worker;
   },
 
-  inject: [ConfigService, VisitsService, PinoLogger],
+  inject: [VisitsService, PinoLogger],
 };

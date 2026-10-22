@@ -13,8 +13,8 @@ import { Throttle } from "@nestjs/throttler";
 
 /**
  * Public redirect entrypoint for short links, restricted to REDIRECT_HOST
- * (e.g. `c7j.ir`) -- relies on `import "dotenv/config"` at the top of main.ts
- * to populate process.env before this decorator runs. Never put behind the JWT guard.
+ * (e.g. `c7j.ir`) -- relies on main.ts loading dotenv, when that package is
+ * installed, before this decorator runs. Never put behind the JWT guard.
  */
 @ApiExcludeController()
 @Controller({ host: process.env.REDIRECT_HOST })
