@@ -12,6 +12,13 @@
   },
   "rewrites": [
     {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "c7j.ir" }],
+      "destination": {
+        "service": "backend"
+      }
+    },
+    {
       "source": "/api/(.*)",
       "destination": {
         "service": "backend"
