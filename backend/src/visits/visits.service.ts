@@ -10,7 +10,10 @@ import { CachedLink, VisitContext } from "../links/dto";
 import { PrismaService } from "../prismaClient/prisma.service";
 import { GEOLOCATION_CLIENT } from "./geolocation.constants";
 
-export type VisitData = VisitContext & CachedLink;
+export type VisitData = VisitContext &
+  CachedLink & {
+    visitId?: number;
+  };
 
 @Injectable()
 export class VisitsService {
@@ -61,23 +64,59 @@ export class VisitsService {
     return response.data;
   }
 
+  async recordVisit(data: VisitData) {
+    const { browser, device } = UAParser(data.userAgent);
+
+    return this.prisma.visit.create({
+      data: {
+        linkId: data.id,
+        source: this.getSourceType(data.referer),
+        ipAddress: this.clientIp(data.ip),
+        browser: browser.name,
+        device: device.type ?? "desktop",
+      },
+      select: { id: true },
+    });
+  }
+
   async visitProcess(data: VisitData) {
-    const referInfo = this.getSourceType(data.referer);
+    if (data.visitId) {
+      await this.enrichVisit(data.visitId, data.ip);
+      return;
+    }
+
     const ipInfo = await this.getIPInfo(data.ip);
     const { browser, device } = UAParser(data.userAgent);
 
-    const createdVisit = await this.prisma.visit.create({
+    return this.prisma.visit.create({
       data: {
         linkId: data.id,
         country: ipInfo.location?.countryCode2,
         city: ipInfo.location?.city,
-        source: referInfo,
+        source: this.getSourceType(data.referer),
         ipAddress: ipInfo.ip,
         browser: browser.name,
         device: device.type ?? "desktop",
       },
     });
+  }
 
-    return createdVisit;
+  private async enrichVisit(visitId: number, ip: string) {
+    const ipInfo = await this.getIPInfo(ip);
+
+    await this.prisma.visit.update({
+      where: { id: visitId },
+      data: {
+        country: ipInfo.location?.countryCode2?.slice(0, 2),
+        city: ipInfo.location?.city?.slice(0, 100),
+        ipAddress: ipInfo.ip?.slice(0, 45) ?? this.clientIp(ip),
+      },
+    });
+  }
+
+  private clientIp(ip: string | undefined): string | undefined {
+    const value = ip?.trim();
+    if (!value || value === "unknown") return undefined;
+    return value.slice(0, 45);
   }
 }

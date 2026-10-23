@@ -181866,1133 +181866,6 @@ var require_short_code_service = __commonJS({
   }
 });
 
-// dist/links/validators/is-safe-redirect-url.validator.js
-var require_is_safe_redirect_url_validator = __commonJS({
-  "dist/links/validators/is-safe-redirect-url.validator.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.IsSafeRedirectUrl = IsSafeRedirectUrl;
-    var class_validator_1 = require_cjs();
-    var MAX_URL_LENGTH = 2048;
-    var BLOCKED_HOSTNAMES = /* @__PURE__ */ new Set(["localhost", "127.0.0.1", "0.0.0.0", "::1"]);
-    var PRIVATE_IPV4_PATTERN = /^(10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.)/;
-    function isPrivateHost(hostname) {
-      if (BLOCKED_HOSTNAMES.has(hostname))
-        return true;
-      if (hostname.endsWith(".local"))
-        return true;
-      if (PRIVATE_IPV4_PATTERN.test(hostname))
-        return true;
-      return false;
-    }
-    function isSafeRedirectUrlValue(value) {
-      if (typeof value !== "string" || value.length > MAX_URL_LENGTH)
-        return false;
-      let url;
-      try {
-        url = new URL(value);
-      } catch {
-        return false;
-      }
-      if (url.protocol !== "http:" && url.protocol !== "https:")
-        return false;
-      if (url.username || url.password)
-        return false;
-      if (isPrivateHost(url.hostname))
-        return false;
-      return true;
-    }
-    function IsSafeRedirectUrl(options) {
-      return function(object, propertyName) {
-        (0, class_validator_1.registerDecorator)({
-          name: "isSafeRedirectUrl",
-          target: object.constructor,
-          propertyName,
-          options,
-          validator: {
-            validate: isSafeRedirectUrlValue,
-            defaultMessage: () => "\u0627\u06CC\u0646 \u0622\u062F\u0631\u0633 \u0645\u062C\u0627\u0632 \u0646\u06CC\u0633\u062A"
-          }
-        });
-      };
-    }
-  }
-});
-
-// dist/links/dto/index.js
-var require_dto2 = __commonJS({
-  "dist/links/dto/index.js"(exports2) {
-    "use strict";
-    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
-      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-      return c > 3 && r && Object.defineProperty(target, key, r), r;
-    };
-    var __metadata2 = exports2 && exports2.__metadata || function(k, v) {
-      if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.UpdateLinkDto = exports2.getLinkDto = exports2.SetActiveLinkDto = exports2.SetPinLinkDto = exports2.GetLinksQueryDto = exports2.SortDto = exports2.SearchDto = exports2.FilterDto = exports2.PaginationDto = exports2.SortOrder = exports2.LinkSortBy = exports2.CreateLinkDto = void 0;
-    var swagger_1 = require_dist15();
-    var class_transformer_1 = require_cjs2();
-    var class_validator_1 = require_cjs();
-    var is_safe_redirect_url_validator_1 = require_is_safe_redirect_url_validator();
-    var CreateLinkDto = class {
-      originalUrl;
-      suggestedCode;
-      title;
-      expiresAt;
-    };
-    exports2.CreateLinkDto = CreateLinkDto;
-    __decorate2([
-      (0, swagger_1.ApiProperty)({
-        description: "URL to shorten. Must use http:// or https://, no username/password in the URL, and no localhost/private/internal addresses.",
-        example: "https://myShop.com/myProduct",
-        maxLength: 2048
-      }),
-      (0, class_validator_1.IsNotEmpty)({ message: "\u0644\u06CC\u0646\u06A9 \u0648\u0631\u0648\u062F\u06CC \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
-      (0, class_validator_1.IsUrl)({ require_protocol: true }, { message: "\u0644\u06CC\u0646\u06A9 \u0628\u0627\u06CC\u062F \u0628\u0627 http:// \u06CC\u0627 https:// \u0634\u0631\u0648\u0639 \u0634\u0648\u062F" }),
-      (0, is_safe_redirect_url_validator_1.IsSafeRedirectUrl)(),
-      __metadata2("design:type", String)
-    ], CreateLinkDto.prototype, "originalUrl", void 0);
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "User suggested code for shortening",
-        example: "xc2z9",
-        minLength: 4,
-        maxLength: 20
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_validator_1.IsString)({ message: "\u06A9\u062F \u067E\u06CC\u0634\u0646\u0647\u0627\u062F\u06CC \u0628\u0627\u06CC\u062F \u0645\u062A\u0646 \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.MinLength)(4, { message: "\u06A9\u062F \u067E\u06CC\u0634\u0646\u0647\u0627\u062F\u06CC \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u0642\u0644 4 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.MaxLength)(20, { message: "\u06A9\u062F \u067E\u06CC\u0634\u0646\u0647\u0627\u062F\u06CC \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u06A9\u062B\u0631 20 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.Matches)(/^[a-zA-Z0-9_-]+$/, {
-        message: "\u06A9\u062F \u067E\u06CC\u0634\u0646\u0647\u0627\u062F\u06CC \u0641\u0642\u0637 \u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u062F \u0634\u0627\u0645\u0644 \u062D\u0631\u0648\u0641\u060C \u0639\u062F\u062F\u060C \u062E\u0637 \u062A\u06CC\u0631\u0647 \u0648 \u0622\u0646\u062F\u0631\u0644\u0627\u06CC\u0646 \u0628\u0627\u0634\u062F"
-      }),
-      __metadata2("design:type", String)
-    ], CreateLinkDto.prototype, "suggestedCode", void 0);
-    __decorate2([
-      (0, swagger_1.ApiProperty)({
-        description: "Title for the shortened link",
-        example: "My Shop Product Page",
-        maxLength: 255
-      }),
-      (0, class_validator_1.IsNotEmpty)({ message: "\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
-      (0, class_validator_1.IsString)({ message: "\u0639\u0646\u0648\u0627\u0646 \u0628\u0627\u06CC\u062F \u0645\u062A\u0646 \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.MaxLength)(255, { message: "\u0639\u0646\u0648\u0627\u0646 \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u06A9\u062B\u0631 255 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
-      __metadata2("design:type", String)
-    ], CreateLinkDto.prototype, "title", void 0);
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "Link expiration date/time (ISO 8601)",
-        example: "2026-12-31T23:59:59.000Z"
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_validator_1.IsDateString)({}, { message: "\u062A\u0627\u0631\u06CC\u062E \u0627\u0646\u0642\u0636\u0627 \u0628\u0627\u06CC\u062F \u062F\u0631 \u0642\u0627\u0644\u0628 \u0645\u0639\u062A\u0628\u0631 \u062A\u0627\u0631\u06CC\u062E \u0628\u0627\u0634\u062F" }),
-      __metadata2("design:type", String)
-    ], CreateLinkDto.prototype, "expiresAt", void 0);
-    var LinkSortBy;
-    (function(LinkSortBy2) {
-      LinkSortBy2["CREATED_AT"] = "createdAt";
-      LinkSortBy2["EXPIRES_AT"] = "expiresAt";
-    })(LinkSortBy || (exports2.LinkSortBy = LinkSortBy = {}));
-    var SortOrder;
-    (function(SortOrder2) {
-      SortOrder2["ASC"] = "asc";
-      SortOrder2["DESC"] = "desc";
-    })(SortOrder || (exports2.SortOrder = SortOrder = {}));
-    var PaginationDto = class {
-      limit = 10;
-      offset = 0;
-    };
-    exports2.PaginationDto = PaginationDto;
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "Number of items per page",
-        example: 10,
-        default: 10,
-        minimum: 1,
-        maximum: 50
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_transformer_1.Type)(() => Number),
-      (0, class_validator_1.IsInt)({ message: "limit \u0628\u0627\u06CC\u062F \u0639\u062F\u062F \u0635\u062D\u06CC\u062D \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.Min)(1, { message: "limit \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u0642\u0644 1 \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.Max)(50, { message: "limit \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u06A9\u062B\u0631 50 \u0628\u0627\u0634\u062F" }),
-      __metadata2("design:type", Number)
-    ], PaginationDto.prototype, "limit", void 0);
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "Number of items to skip from the start of the list",
-        example: 0,
-        default: 0,
-        minimum: 0
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_transformer_1.Type)(() => Number),
-      (0, class_validator_1.IsInt)({ message: "offset \u0628\u0627\u06CC\u062F \u0639\u062F\u062F \u0635\u062D\u06CC\u062D \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.Min)(0, { message: "offset \u0646\u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u062F \u0645\u0646\u0641\u06CC \u0628\u0627\u0634\u062F" }),
-      __metadata2("design:type", Number)
-    ], PaginationDto.prototype, "offset", void 0);
-    var toBoolean = ({ value }) => {
-      if (value === "true")
-        return true;
-      if (value === "false")
-        return false;
-      return value;
-    };
-    var FilterDto = class {
-      isActive;
-      isPin;
-      expired;
-    };
-    exports2.FilterDto = FilterDto;
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "Filter by whether the link is active",
-        example: true
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_transformer_1.Transform)(toBoolean),
-      (0, class_validator_1.IsBoolean)({ message: "isActive \u0628\u0627\u06CC\u062F \u0645\u0642\u062F\u0627\u0631 \u062F\u0631\u0633\u062A \u06CC\u0627 \u0646\u0627\u062F\u0631\u0633\u062A \u0628\u0627\u0634\u062F" }),
-      __metadata2("design:type", Boolean)
-    ], FilterDto.prototype, "isActive", void 0);
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "Filter by whether the link is pinned",
-        example: true
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_transformer_1.Transform)(toBoolean),
-      (0, class_validator_1.IsBoolean)({ message: "isPin \u0628\u0627\u06CC\u062F \u0645\u0642\u062F\u0627\u0631 \u062F\u0631\u0633\u062A \u06CC\u0627 \u0646\u0627\u062F\u0631\u0633\u062A \u0628\u0627\u0634\u062F" }),
-      __metadata2("design:type", Boolean)
-    ], FilterDto.prototype, "isPin", void 0);
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "Filter by whether the link has expired (true: expired, false: valid or unlimited)",
-        example: false
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_transformer_1.Transform)(toBoolean),
-      (0, class_validator_1.IsBoolean)({ message: "expired \u0628\u0627\u06CC\u062F \u0645\u0642\u062F\u0627\u0631 \u062F\u0631\u0633\u062A \u06CC\u0627 \u0646\u0627\u062F\u0631\u0633\u062A \u0628\u0627\u0634\u062F" }),
-      __metadata2("design:type", Boolean)
-    ], FilterDto.prototype, "expired", void 0);
-    var SearchDto = class {
-      search;
-    };
-    exports2.SearchDto = SearchDto;
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "Search in title and original URL",
-        example: "myShop",
-        maxLength: 255
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_validator_1.IsString)({ message: "search \u0628\u0627\u06CC\u062F \u0645\u062A\u0646 \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.MaxLength)(255, { message: "search \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u06A9\u062B\u0631 255 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
-      __metadata2("design:type", String)
-    ], SearchDto.prototype, "search", void 0);
-    var SortDto = class {
-      sortBy = LinkSortBy.CREATED_AT;
-      sortOrder = SortOrder.DESC;
-    };
-    exports2.SortDto = SortDto;
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "Field to sort by",
-        enum: LinkSortBy,
-        default: LinkSortBy.CREATED_AT
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_validator_1.IsEnum)(LinkSortBy, { message: "sortBy \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A" }),
-      __metadata2("design:type", String)
-    ], SortDto.prototype, "sortBy", void 0);
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "Sort direction",
-        enum: SortOrder,
-        default: SortOrder.DESC
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_validator_1.IsEnum)(SortOrder, { message: "sortOrder \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A" }),
-      __metadata2("design:type", String)
-    ], SortDto.prototype, "sortOrder", void 0);
-    var GetLinksQueryDto = class extends (0, swagger_1.IntersectionType)(PaginationDto, FilterDto, SortDto, SearchDto) {
-    };
-    exports2.GetLinksQueryDto = GetLinksQueryDto;
-    var SetPinLinkDto = class {
-      linkId;
-      isPin;
-    };
-    exports2.SetPinLinkDto = SetPinLinkDto;
-    __decorate2([
-      (0, swagger_1.ApiProperty)({
-        description: "Id of the link to pin/unpin",
-        example: 1
-      }),
-      (0, class_validator_1.IsNotEmpty)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
-      (0, class_validator_1.IsInt)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0628\u0627\u06CC\u062F \u0639\u062F\u062F \u0635\u062D\u06CC\u062D \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.IsPositive)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A" }),
-      __metadata2("design:type", Number)
-    ], SetPinLinkDto.prototype, "linkId", void 0);
-    __decorate2([
-      (0, swagger_1.ApiProperty)({
-        description: "Whether the link should be pinned",
-        example: true
-      }),
-      (0, class_validator_1.IsNotEmpty)({ message: "\u0648\u0636\u0639\u06CC\u062A \u067E\u06CC\u0646 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
-      (0, class_validator_1.IsBoolean)({ message: "\u0648\u0636\u0639\u06CC\u062A \u067E\u06CC\u0646 \u0628\u0627\u06CC\u062F \u0645\u0642\u062F\u0627\u0631 \u062F\u0631\u0633\u062A \u06CC\u0627 \u0646\u0627\u062F\u0631\u0633\u062A \u0628\u0627\u0634\u062F" }),
-      __metadata2("design:type", Boolean)
-    ], SetPinLinkDto.prototype, "isPin", void 0);
-    var SetActiveLinkDto = class {
-      linkId;
-      isActive;
-    };
-    exports2.SetActiveLinkDto = SetActiveLinkDto;
-    __decorate2([
-      (0, swagger_1.ApiProperty)({
-        description: "Id of the link to activate/deactivate",
-        example: 1
-      }),
-      (0, class_validator_1.IsNotEmpty)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
-      (0, class_validator_1.IsInt)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0628\u0627\u06CC\u062F \u0639\u062F\u062F \u0635\u062D\u06CC\u062D \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.IsPositive)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A" }),
-      __metadata2("design:type", Number)
-    ], SetActiveLinkDto.prototype, "linkId", void 0);
-    __decorate2([
-      (0, swagger_1.ApiProperty)({
-        description: "Whether the link should be active",
-        example: true
-      }),
-      (0, class_validator_1.IsNotEmpty)({ message: "\u0648\u0636\u0639\u06CC\u062A \u0641\u0639\u0627\u0644 \u0628\u0648\u062F\u0646 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
-      (0, class_validator_1.IsBoolean)({ message: "\u0648\u0636\u0639\u06CC\u062A \u0641\u0639\u0627\u0644 \u0628\u0648\u062F\u0646 \u0628\u0627\u06CC\u062F \u0645\u0642\u062F\u0627\u0631 \u062F\u0631\u0633\u062A \u06CC\u0627 \u0646\u0627\u062F\u0631\u0633\u062A \u0628\u0627\u0634\u062F" }),
-      __metadata2("design:type", Boolean)
-    ], SetActiveLinkDto.prototype, "isActive", void 0);
-    var getLinkDto = class {
-      shortCode;
-    };
-    exports2.getLinkDto = getLinkDto;
-    __decorate2([
-      (0, swagger_1.ApiProperty)({
-        description: "short code",
-        example: "user short code"
-      }),
-      (0, class_validator_1.IsNotEmpty)({ message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
-      (0, class_validator_1.IsString)({ message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0628\u0627\u06CC\u062F \u0645\u062A\u0646 \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.Matches)(/^[A-Za-z0-9_-]{4,20}$/, { message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A" }),
-      __metadata2("design:type", String)
-    ], getLinkDto.prototype, "shortCode", void 0);
-    var UpdateLinkDto = class {
-      linkId;
-      title;
-      shortCode;
-      originalUrl;
-      expiresAt;
-    };
-    exports2.UpdateLinkDto = UpdateLinkDto;
-    __decorate2([
-      (0, swagger_1.ApiProperty)({
-        description: "Id of the link to update",
-        example: 1
-      }),
-      (0, class_validator_1.IsNotEmpty)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
-      (0, class_validator_1.IsInt)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0628\u0627\u06CC\u062F \u0639\u062F\u062F \u0635\u062D\u06CC\u062D \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.IsPositive)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A" }),
-      __metadata2("design:type", Number)
-    ], UpdateLinkDto.prototype, "linkId", void 0);
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "Title for the shortened link",
-        example: "My Shop Product Page",
-        maxLength: 255
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_validator_1.IsNotEmpty)({ message: "\u0639\u0646\u0648\u0627\u0646 \u0646\u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u062F \u062E\u0627\u0644\u06CC \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.IsString)({ message: "\u0639\u0646\u0648\u0627\u0646 \u0628\u0627\u06CC\u062F \u0645\u062A\u0646 \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.MaxLength)(255, { message: "\u0639\u0646\u0648\u0627\u0646 \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u06A9\u062B\u0631 255 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
-      __metadata2("design:type", String)
-    ], UpdateLinkDto.prototype, "title", void 0);
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "New short code for the link",
-        example: "xc2z9",
-        minLength: 4,
-        maxLength: 20
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_validator_1.IsString)({ message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0628\u0627\u06CC\u062F \u0645\u062A\u0646 \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.MinLength)(4, { message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u0642\u0644 4 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.MaxLength)(20, { message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u06A9\u062B\u0631 20 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.Matches)(/^[a-zA-Z0-9_-]+$/, {
-        message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0641\u0642\u0637 \u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u062F \u0634\u0627\u0645\u0644 \u062D\u0631\u0648\u0641\u060C \u0639\u062F\u062F\u060C \u062E\u0637 \u062A\u06CC\u0631\u0647 \u0648 \u0622\u0646\u062F\u0631\u0644\u0627\u06CC\u0646 \u0628\u0627\u0634\u062F"
-      }),
-      __metadata2("design:type", String)
-    ], UpdateLinkDto.prototype, "shortCode", void 0);
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "URL to shorten. Must use http:// or https://, no username/password in the URL, and no localhost/private/internal addresses.",
-        example: "https://myShop.com/myProduct",
-        maxLength: 2048
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_validator_1.IsNotEmpty)({ message: "\u0644\u06CC\u0646\u06A9 \u0648\u0631\u0648\u062F\u06CC \u0646\u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u062F \u062E\u0627\u0644\u06CC \u0628\u0627\u0634\u062F" }),
-      (0, class_validator_1.IsUrl)({ require_protocol: true }, { message: "\u0644\u06CC\u0646\u06A9 \u0628\u0627\u06CC\u062F \u0628\u0627 http:// \u06CC\u0627 https:// \u0634\u0631\u0648\u0639 \u0634\u0648\u062F" }),
-      (0, is_safe_redirect_url_validator_1.IsSafeRedirectUrl)(),
-      __metadata2("design:type", String)
-    ], UpdateLinkDto.prototype, "originalUrl", void 0);
-    __decorate2([
-      (0, swagger_1.ApiPropertyOptional)({
-        description: "Link expiration date/time (ISO 8601)",
-        example: "2026-12-31T23:59:59.000Z"
-      }),
-      (0, class_validator_1.IsOptional)(),
-      (0, class_validator_1.IsDateString)({}, { message: "\u062A\u0627\u0631\u06CC\u062E \u0627\u0646\u0642\u0636\u0627 \u0628\u0627\u06CC\u062F \u062F\u0631 \u0642\u0627\u0644\u0628 \u0645\u0639\u062A\u0628\u0631 \u062A\u0627\u0631\u06CC\u062E \u0628\u0627\u0634\u062F" }),
-      __metadata2("design:type", String)
-    ], UpdateLinkDto.prototype, "expiresAt", void 0);
-  }
-});
-
-// dist/links/links.service.js
-var require_links_service = __commonJS({
-  "dist/links/links.service.js"(exports2) {
-    "use strict";
-    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
-      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-      return c > 3 && r && Object.defineProperty(target, key, r), r;
-    };
-    var __metadata2 = exports2 && exports2.__metadata || function(k, v) {
-      if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-    };
-    var __param2 = exports2 && exports2.__param || function(paramIndex, decorator) {
-      return function(target, key) {
-        decorator(target, key, paramIndex);
-      };
-    };
-    var __importDefault2 = exports2 && exports2.__importDefault || function(mod) {
-      return mod && mod.__esModule ? mod : { "default": mod };
-    };
-    var LinksService_1;
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.LinksService = void 0;
-    var common_1 = require_common();
-    var bullmq_1 = require_cjs4();
-    var ioredis_1 = __importDefault2(require_built3());
-    var nestjs_pino_1 = require_nestjs_pino();
-    var bullMq_constant_1 = require_bullMq_constant();
-    var client_1 = require_client4();
-    var prisma_service_1 = require_prisma_service();
-    var redis_constants_1 = require_redis_constants();
-    var short_code_service_1 = require_short_code_service();
-    var dto_1 = require_dto2();
-    var MAX_GENERATION_ATTEMPTS = 5;
-    var UNIQUE_CONSTRAINT_ERROR_CODE = "P2002";
-    var LinksService = LinksService_1 = class LinksService {
-      redis;
-      bullMQ;
-      prisma;
-      shortCodeService;
-      logger;
-      constructor(redis, bullMQ, prisma, shortCodeService, logger) {
-        this.redis = redis;
-        this.bullMQ = bullMQ;
-        this.prisma = prisma;
-        this.shortCodeService = shortCodeService;
-        this.logger = logger;
-        this.logger.setContext(LinksService_1.name);
-      }
-      async getUserAllLinks(user, query = {}) {
-        const { limit = 10, offset = 0 } = query;
-        const sortBy = query.sortBy ?? dto_1.LinkSortBy.CREATED_AT;
-        const sortOrder = query.sortOrder ?? dto_1.SortOrder.DESC;
-        let expiredCondition = {};
-        let searchCondition = {};
-        let orderByCondition = {};
-        if (query.expired === true) {
-          expiredCondition = { expiresAt: { lte: /* @__PURE__ */ new Date() } };
-        } else if (query.expired === false) {
-          expiredCondition = {
-            OR: [{ expiresAt: null }, { expiresAt: { gt: /* @__PURE__ */ new Date() } }]
-          };
-        }
-        if (query.search) {
-          searchCondition = {
-            OR: [
-              { title: { contains: query.search, mode: "insensitive" } },
-              { originalUrl: { contains: query.search, mode: "insensitive" } }
-            ]
-          };
-        }
-        const noFilterOrSortRequested = query.sortBy === void 0 && query.isActive === void 0 && query.isPin === void 0 && query.expired === void 0;
-        if (noFilterOrSortRequested) {
-          orderByCondition = [
-            { isPin: dto_1.SortOrder.DESC },
-            { isActive: dto_1.SortOrder.DESC },
-            { createdAt: dto_1.SortOrder.DESC },
-            { id: dto_1.SortOrder.DESC }
-          ];
-        } else {
-          orderByCondition = sortBy === dto_1.LinkSortBy.CREATED_AT ? [{ createdAt: sortOrder }, { id: sortOrder }] : [
-            { expiresAt: { sort: sortOrder, nulls: "last" } },
-            { id: sortOrder }
-          ];
-        }
-        const whereCondition = {
-          isActive: query.isActive,
-          isPin: query.isPin,
-          authorId: user.id,
-          AND: [searchCondition, expiredCondition],
-          deletedAt: null
-        };
-        const [links, totalCount] = await Promise.all([
-          this.prisma.link.findMany({
-            skip: offset,
-            take: limit,
-            where: whereCondition,
-            orderBy: orderByCondition
-          }),
-          this.prisma.link.count({
-            where: whereCondition
-          })
-        ]);
-        return {
-          links,
-          totalCount,
-          limit,
-          offset,
-          totalPages: Math.ceil(totalCount / limit)
-        };
-      }
-      async getStatistics() {
-        const totalActiveLinks = await this.prisma.link.count({
-          where: { isActive: true, deletedAt: null }
-        });
-        const totalVisits = await this.prisma.visit.count();
-        const totalActiveUsers = await this.prisma.user.count();
-        return {
-          totalActiveLinks,
-          totalVisits,
-          totalActiveUsers
-        };
-      }
-      async createUserLink(createData, author) {
-        const shortCode = createData.suggestedCode ? await this.reserveSuggestedCode(createData.suggestedCode) : void 0;
-        const data = {
-          author: { connect: { id: author.id } },
-          originalUrl: createData.originalUrl,
-          title: createData.title,
-          expiresAt: createData.expiresAt
-        };
-        if (shortCode) {
-          return this.prisma.link.create({ data: { ...data, shortCode } });
-        }
-        return this.createWithGeneratedCode(data);
-      }
-      async reserveSuggestedCode(suggestedCode) {
-        const existingLink = await this.prisma.link.findUnique({
-          where: { shortCode: suggestedCode },
-          select: { id: true }
-        });
-        if (existingLink) {
-          throw new common_1.ConflictException("\u0627\u06CC\u0646 \u06A9\u062F \u0642\u0628\u0644\u0627 \u0627\u0633\u062A\u0641\u0627\u062F\u0647 \u0634\u062F\u0647 \u0627\u0633\u062A");
-        }
-        return suggestedCode;
-      }
-      async createWithGeneratedCode(data) {
-        const totalLinks = await this.prisma.link.count();
-        const codeLength = this.calculateCodeLength(totalLinks);
-        for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
-          const shortCode = this.shortCodeService.generate(codeLength);
-          try {
-            return await this.prisma.link.create({ data: { ...data, shortCode } });
-          } catch (err) {
-            if (this.isUniqueConstraintViolation(err)) {
-              continue;
-            }
-            throw err;
-          }
-        }
-        throw new common_1.InternalServerErrorException("\u0627\u0645\u06A9\u0627\u0646 \u0633\u0627\u062E\u062A \u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u06CC\u06A9\u062A\u0627 \u0648\u062C\u0648\u062F \u0646\u062F\u0627\u0634\u062A\u060C \u062F\u0648\u0628\u0627\u0631\u0647 \u062A\u0644\u0627\u0634 \u06A9\u0646\u06CC\u062F");
-      }
-      calculateCodeLength(totalLinks) {
-        if (totalLinks < 1e3)
-          return 4;
-        if (totalLinks < 1e5)
-          return 5;
-        if (totalLinks < 5e6)
-          return 6;
-        return 7;
-      }
-      isUniqueConstraintViolation(err) {
-        return err instanceof client_1.Prisma.PrismaClientKnownRequestError && err.code === UNIQUE_CONSTRAINT_ERROR_CODE;
-      }
-      async visitLink(userRequest, getData) {
-        const shortCodeExistString = await this.redis.get(`link:${getData.shortCode}`);
-        let userData;
-        if (shortCodeExistString) {
-          const shortCodeExist = JSON.parse(shortCodeExistString);
-          userData = shortCodeExist;
-        } else {
-          const link = await this.prisma.link.findFirst({
-            where: {
-              shortCode: getData.shortCode,
-              isActive: true,
-              deletedAt: null,
-              OR: [{ expiresAt: null }, { expiresAt: { gt: /* @__PURE__ */ new Date() } }]
-            }
-          });
-          if (!link) {
-            throw new common_1.NotFoundException("\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0646\u0627\u0645\u0639\u0628\u062A\u0631 \u0627\u0633\u062A.");
-          }
-          userData = { id: link.id, originalUrl: link.originalUrl };
-          await this.redis.set(`link:${link?.shortCode}`, JSON.stringify({ id: link.id, originalUrl: link.originalUrl }), "EX", redis_constants_1.LINK_CACHE_TTL_SECONDS, "NX");
-        }
-        this.bullMQ.add("recordVisit", { ...userRequest, ...userData }, {
-          removeOnComplete: 100,
-          removeOnFail: 100,
-          attempts: 3,
-          backoff: {
-            type: "exponential",
-            delay: 1e3
-          }
-        }).catch((err) => {
-          this.logger.error({ err, shortCode: getData.shortCode }, "failed to enqueue visit-processing job");
-        });
-        return userData.originalUrl;
-      }
-      async setPinLink(updateData, user) {
-        const linkData = await this.prisma.link.findUnique({
-          where: { id: updateData.linkId }
-        });
-        if (!linkData) {
-          throw new common_1.NotFoundException("\u0644\u06CC\u0646\u06A9 \u0634\u0645\u0627 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A.");
-        }
-        if (linkData.authorId !== user.id) {
-          throw new common_1.ForbiddenException("\u0634\u0645\u0627 \u062F\u0633\u062A\u0631\u0633\u06CC \u0628\u0647 \u0627\u06CC\u0646 \u0644\u06CC\u0646\u06A9 \u0646\u062F\u0627\u0631\u06CC\u062F.");
-        }
-        return this.prisma.link.update({
-          where: { id: updateData.linkId },
-          data: { isPin: updateData.isPin }
-        });
-      }
-      async setActiveLink(updateData, user) {
-        const linkData = await this.prisma.link.findUnique({
-          where: { id: updateData.linkId }
-        });
-        if (!linkData) {
-          throw new common_1.NotFoundException("\u0644\u06CC\u0646\u06A9 \u0634\u0645\u0627 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A.");
-        }
-        if (linkData.authorId !== user.id) {
-          throw new common_1.ForbiddenException("\u0634\u0645\u0627 \u062F\u0633\u062A\u0631\u0633\u06CC \u0628\u0647 \u0627\u06CC\u0646 \u0644\u06CC\u0646\u06A9 \u0646\u062F\u0627\u0631\u06CC\u062F.");
-        }
-        const updatedLink = await this.prisma.link.update({
-          where: { id: updateData.linkId },
-          data: { isActive: updateData.isActive }
-        });
-        await this.redis.del(`link:${linkData.shortCode}`);
-        return updatedLink;
-      }
-      async deleteLink(linkId, user) {
-        const linkData = await this.prisma.link.findUnique({
-          where: { id: linkId }
-        });
-        if (!linkData) {
-          throw new common_1.NotFoundException("\u0644\u06CC\u0646\u06A9 \u0634\u0645\u0627 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A.");
-        }
-        if (linkData.authorId !== user.id) {
-          throw new common_1.ForbiddenException("\u0634\u0645\u0627 \u062F\u0633\u062A\u0631\u0633\u06CC \u0628\u0647 \u0627\u06CC\u0646 \u0644\u06CC\u0646\u06A9 \u0646\u062F\u0627\u0631\u06CC\u062F.");
-        }
-        const deletedLink = await this.prisma.link.update({
-          where: { id: linkId },
-          data: { deletedAt: /* @__PURE__ */ new Date() }
-        });
-        await this.redis.del(`link:${linkData.shortCode}`);
-        return deletedLink;
-      }
-      async updateLink(updateData, user) {
-        const linkData = await this.prisma.link.findUnique({
-          where: { id: updateData.linkId }
-        });
-        if (!linkData) {
-          throw new common_1.NotFoundException("\u0644\u06CC\u0646\u06A9 \u0634\u0645\u0627 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A.");
-        }
-        if (linkData.authorId !== user.id) {
-          throw new common_1.ForbiddenException("\u0634\u0645\u0627 \u062F\u0633\u062A\u0631\u0633\u06CC \u0628\u0647 \u0627\u06CC\u0646 \u0644\u06CC\u0646\u06A9 \u0646\u062F\u0627\u0631\u06CC\u062F.");
-        }
-        let newShortCode;
-        if (updateData.shortCode && updateData.shortCode !== linkData.shortCode) {
-          newShortCode = await this.reserveSuggestedCode(updateData.shortCode);
-        }
-        if (updateData.originalUrl !== void 0 || newShortCode !== void 0) {
-          await this.redis.del(`link:${linkData?.shortCode}`);
-        }
-        return await this.prisma.link.update({
-          where: { id: updateData.linkId },
-          data: {
-            title: updateData.title,
-            originalUrl: updateData.originalUrl,
-            expiresAt: updateData.expiresAt,
-            shortCode: newShortCode
-          }
-        });
-      }
-    };
-    exports2.LinksService = LinksService;
-    exports2.LinksService = LinksService = LinksService_1 = __decorate2([
-      (0, common_1.Injectable)(),
-      __param2(0, (0, common_1.Inject)(redis_constants_1.REDIS_CLIENT)),
-      __param2(1, (0, common_1.Inject)(bullMq_constant_1.VISIT_QUEUE)),
-      __metadata2("design:paramtypes", [
-        ioredis_1.default,
-        bullmq_1.Queue,
-        prisma_service_1.PrismaService,
-        short_code_service_1.ShortCodeService,
-        nestjs_pino_1.PinoLogger
-      ])
-    ], LinksService);
-  }
-});
-
-// dist/links/links.controller.js
-var require_links_controller = __commonJS({
-  "dist/links/links.controller.js"(exports2) {
-    "use strict";
-    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
-      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-      return c > 3 && r && Object.defineProperty(target, key, r), r;
-    };
-    var __metadata2 = exports2 && exports2.__metadata || function(k, v) {
-      if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-    };
-    var __param2 = exports2 && exports2.__param || function(paramIndex, decorator) {
-      return function(target, key) {
-        decorator(target, key, paramIndex);
-      };
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.LinksController = void 0;
-    var common_1 = require_common();
-    var swagger_1 = require_dist15();
-    var links_service_1 = require_links_service();
-    var dto_1 = require_dto2();
-    var throttler_1 = require_dist13();
-    var jwt_auth_guard_1 = require_jwt_auth_guard();
-    var current_user_decorator_1 = require_current_user_decorator();
-    var LinksController = class LinksController {
-      linksService;
-      constructor(linksService) {
-        this.linksService = linksService;
-      }
-      async getStatistics() {
-        return await this.linksService.getStatistics();
-      }
-      async getUserLinks(user, query) {
-        return await this.linksService.getUserAllLinks(user, query);
-      }
-      createLink(createLinkDto, user) {
-        return this.linksService.createUserLink(createLinkDto, user);
-      }
-      async setPinLink(updateData, user) {
-        return await this.linksService.setPinLink(updateData, user);
-      }
-      async setActiveLink(updateData, user) {
-        return await this.linksService.setActiveLink(updateData, user);
-      }
-      async updateLink(updateData, user) {
-        return await this.linksService.updateLink(updateData, user);
-      }
-      async deleteLink(linkId, user) {
-        return await this.linksService.deleteLink(linkId, user);
-      }
-    };
-    exports2.LinksController = LinksController;
-    __decorate2([
-      (0, common_1.Get)("statistics"),
-      (0, throttler_1.Throttle)({ default: { limit: 30, ttl: 6e4 } }),
-      (0, swagger_1.ApiOperation)({ summary: "Get public platform-wide usage statistics" }),
-      (0, swagger_1.ApiOkResponse)({
-        description: "Aggregate counts of active links, visits, and active users"
-      }),
-      __metadata2("design:type", Function),
-      __metadata2("design:paramtypes", []),
-      __metadata2("design:returntype", Promise)
-    ], LinksController.prototype, "getStatistics", null);
-    __decorate2([
-      (0, common_1.Get)(),
-      (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-      (0, swagger_1.ApiOperation)({ summary: "List links owned by the current user" }),
-      (0, swagger_1.ApiOkResponse)({ description: "A paginated list of the user's links" }),
-      (0, swagger_1.ApiBadRequestResponse)({
-        description: "Invalid pagination, filter, sort, or search query params"
-      }),
-      (0, swagger_1.ApiUnauthorizedResponse)({ description: "Missing or invalid authentication" }),
-      __param2(0, (0, current_user_decorator_1.CurrentUser)()),
-      __param2(1, (0, common_1.Query)()),
-      __metadata2("design:type", Function),
-      __metadata2("design:paramtypes", [Object, dto_1.GetLinksQueryDto]),
-      __metadata2("design:returntype", Promise)
-    ], LinksController.prototype, "getUserLinks", null);
-    __decorate2([
-      (0, common_1.Post)(),
-      (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-      (0, throttler_1.Throttle)({ default: { limit: 20, ttl: 6e4 } }),
-      (0, swagger_1.ApiOperation)({ summary: "Create a new shortened link for the current user" }),
-      (0, swagger_1.ApiCreatedResponse)({ description: "The link was created successfully" }),
-      (0, swagger_1.ApiConflictResponse)({
-        description: "The suggested short code is already in use"
-      }),
-      (0, swagger_1.ApiBadRequestResponse)({
-        description: "Invalid input, e.g. originalUrl is not http(s), has credentials in it, or points to a localhost/private/internal address"
-      }),
-      (0, swagger_1.ApiUnauthorizedResponse)({ description: "Missing or invalid authentication" }),
-      __param2(0, (0, common_1.Body)()),
-      __param2(1, (0, current_user_decorator_1.CurrentUser)()),
-      __metadata2("design:type", Function),
-      __metadata2("design:paramtypes", [dto_1.CreateLinkDto, Object]),
-      __metadata2("design:returntype", void 0)
-    ], LinksController.prototype, "createLink", null);
-    __decorate2([
-      (0, common_1.Patch)("pin"),
-      (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-      (0, throttler_1.Throttle)({ default: { limit: 20, ttl: 6e4 } }),
-      (0, swagger_1.ApiOperation)({ summary: "Pin or unpin a link owned by the current user" }),
-      (0, swagger_1.ApiOkResponse)({ description: "The link's pin state was updated" }),
-      (0, swagger_1.ApiBadRequestResponse)({ description: "Invalid linkId or isPin value" }),
-      (0, swagger_1.ApiUnauthorizedResponse)({ description: "Missing or invalid authentication" }),
-      (0, swagger_1.ApiForbiddenResponse)({ description: "The link belongs to another user" }),
-      (0, swagger_1.ApiNotFoundResponse)({ description: "No link exists with the given linkId" }),
-      __param2(0, (0, common_1.Body)()),
-      __param2(1, (0, current_user_decorator_1.CurrentUser)()),
-      __metadata2("design:type", Function),
-      __metadata2("design:paramtypes", [dto_1.SetPinLinkDto, Object]),
-      __metadata2("design:returntype", Promise)
-    ], LinksController.prototype, "setPinLink", null);
-    __decorate2([
-      (0, common_1.Patch)("active"),
-      (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-      (0, throttler_1.Throttle)({ default: { limit: 20, ttl: 6e4 } }),
-      (0, swagger_1.ApiOperation)({
-        summary: "Activate or deactivate a link owned by the current user"
-      }),
-      (0, swagger_1.ApiOkResponse)({ description: "The link's active state was updated" }),
-      (0, swagger_1.ApiBadRequestResponse)({ description: "Invalid linkId or isActive value" }),
-      (0, swagger_1.ApiUnauthorizedResponse)({ description: "Missing or invalid authentication" }),
-      (0, swagger_1.ApiForbiddenResponse)({ description: "The link belongs to another user" }),
-      (0, swagger_1.ApiNotFoundResponse)({ description: "No link exists with the given linkId" }),
-      __param2(0, (0, common_1.Body)()),
-      __param2(1, (0, current_user_decorator_1.CurrentUser)()),
-      __metadata2("design:type", Function),
-      __metadata2("design:paramtypes", [dto_1.SetActiveLinkDto, Object]),
-      __metadata2("design:returntype", Promise)
-    ], LinksController.prototype, "setActiveLink", null);
-    __decorate2([
-      (0, common_1.Put)(),
-      (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-      (0, throttler_1.Throttle)({ default: { limit: 20, ttl: 6e4 } }),
-      (0, swagger_1.ApiOperation)({ summary: "Update a link owned by the current user" }),
-      (0, swagger_1.ApiOkResponse)({ description: "The link was updated" }),
-      (0, swagger_1.ApiConflictResponse)({
-        description: "The requested short code is already in use"
-      }),
-      (0, swagger_1.ApiBadRequestResponse)({
-        description: "Invalid input, e.g. originalUrl is not http(s), has credentials in it, or points to a localhost/private/internal address"
-      }),
-      (0, swagger_1.ApiUnauthorizedResponse)({ description: "Missing or invalid authentication" }),
-      (0, swagger_1.ApiForbiddenResponse)({ description: "The link belongs to another user" }),
-      (0, swagger_1.ApiNotFoundResponse)({ description: "No link exists with the given linkId" }),
-      __param2(0, (0, common_1.Body)()),
-      __param2(1, (0, current_user_decorator_1.CurrentUser)()),
-      __metadata2("design:type", Function),
-      __metadata2("design:paramtypes", [dto_1.UpdateLinkDto, Object]),
-      __metadata2("design:returntype", Promise)
-    ], LinksController.prototype, "updateLink", null);
-    __decorate2([
-      (0, common_1.Delete)(":linkId"),
-      (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-      (0, throttler_1.Throttle)({ default: { limit: 20, ttl: 6e4 } }),
-      (0, swagger_1.ApiOperation)({ summary: "Soft-delete a link owned by the current user" }),
-      (0, swagger_1.ApiOkResponse)({ description: "The link was deleted" }),
-      (0, swagger_1.ApiBadRequestResponse)({ description: "Invalid linkId" }),
-      (0, swagger_1.ApiUnauthorizedResponse)({ description: "Missing or invalid authentication" }),
-      (0, swagger_1.ApiForbiddenResponse)({ description: "The link belongs to another user" }),
-      (0, swagger_1.ApiNotFoundResponse)({ description: "No link exists with the given linkId" }),
-      __param2(0, (0, common_1.Param)("linkId", common_1.ParseIntPipe)),
-      __param2(1, (0, current_user_decorator_1.CurrentUser)()),
-      __metadata2("design:type", Function),
-      __metadata2("design:paramtypes", [Number, Object]),
-      __metadata2("design:returntype", Promise)
-    ], LinksController.prototype, "deleteLink", null);
-    exports2.LinksController = LinksController = __decorate2([
-      (0, swagger_1.ApiTags)("links"),
-      (0, swagger_1.ApiBearerAuth)(),
-      (0, common_1.Controller)("api/links"),
-      __metadata2("design:paramtypes", [links_service_1.LinksService])
-    ], LinksController);
-  }
-});
-
-// dist/links/redirect.controller.js
-var require_redirect_controller = __commonJS({
-  "dist/links/redirect.controller.js"(exports2) {
-    "use strict";
-    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
-      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-      return c > 3 && r && Object.defineProperty(target, key, r), r;
-    };
-    var __metadata2 = exports2 && exports2.__metadata || function(k, v) {
-      if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-    };
-    var __param2 = exports2 && exports2.__param || function(paramIndex, decorator) {
-      return function(target, key) {
-        decorator(target, key, paramIndex);
-      };
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.GoRedirectController = exports2.RedirectController = void 0;
-    var common_1 = require_common();
-    var swagger_1 = require_dist15();
-    var links_service_1 = require_links_service();
-    var dto_1 = require_dto2();
-    var throttler_1 = require_dist13();
-    function headerValue(value) {
-      const first = Array.isArray(value) ? value[0] : value;
-      return first?.trim() || "unknown";
-    }
-    function visitContext(request) {
-      return {
-        ip: request.ip ?? "unknown",
-        userAgent: headerValue(request.headers["user-agent"]),
-        referer: headerValue(request.headers["referer"])
-      };
-    }
-    var RedirectController = class RedirectController {
-      linksService;
-      constructor(linksService) {
-        this.linksService = linksService;
-      }
-      async redirect(getData, request) {
-        const originalUrl = await this.linksService.visitLink(visitContext(request), getData);
-        return { url: originalUrl, statusCode: 302 };
-      }
-    };
-    exports2.RedirectController = RedirectController;
-    __decorate2([
-      (0, common_1.Get)(":shortCode"),
-      (0, common_1.Redirect)(),
-      (0, swagger_1.ApiOperation)({
-        summary: "Resolve a short code and redirect the visitor to the original URL"
-      }),
-      (0, swagger_1.ApiParam)({ name: "shortCode", example: "abc123" }),
-      (0, swagger_1.ApiFoundResponse)({ description: "Redirects (302) to the original URL" }),
-      (0, swagger_1.ApiNotFoundResponse)({ description: "No link exists for this short code" }),
-      (0, throttler_1.Throttle)({ default: { limit: 30, ttl: 6e4 } }),
-      (0, common_1.Header)("Cache-Control", "no-store"),
-      __param2(0, (0, common_1.Param)()),
-      __param2(1, (0, common_1.Req)()),
-      __metadata2("design:type", Function),
-      __metadata2("design:paramtypes", [dto_1.getLinkDto, Object]),
-      __metadata2("design:returntype", Promise)
-    ], RedirectController.prototype, "redirect", null);
-    exports2.RedirectController = RedirectController = __decorate2([
-      (0, swagger_1.ApiExcludeController)(),
-      (0, common_1.Controller)({ host: process.env.REDIRECT_HOST }),
-      __metadata2("design:paramtypes", [links_service_1.LinksService])
-    ], RedirectController);
-    var GoRedirectController = class GoRedirectController {
-      linksService;
-      constructor(linksService) {
-        this.linksService = linksService;
-      }
-      async redirect(getData, request) {
-        const originalUrl = await this.linksService.visitLink(visitContext(request), getData);
-        return { url: originalUrl, statusCode: 302 };
-      }
-    };
-    exports2.GoRedirectController = GoRedirectController;
-    __decorate2([
-      (0, common_1.Get)(":shortCode"),
-      (0, common_1.Redirect)(),
-      (0, throttler_1.Throttle)({ default: { limit: 30, ttl: 6e4 } }),
-      (0, common_1.Header)("Cache-Control", "no-store"),
-      __param2(0, (0, common_1.Param)()),
-      __param2(1, (0, common_1.Req)()),
-      __metadata2("design:type", Function),
-      __metadata2("design:paramtypes", [dto_1.getLinkDto, Object]),
-      __metadata2("design:returntype", Promise)
-    ], GoRedirectController.prototype, "redirect", null);
-    exports2.GoRedirectController = GoRedirectController = __decorate2([
-      (0, swagger_1.ApiExcludeController)(),
-      (0, common_1.Controller)("api/go"),
-      __metadata2("design:paramtypes", [links_service_1.LinksService])
-    ], GoRedirectController);
-  }
-});
-
-// dist/links/visitor-ip.middleware.js
-var require_visitor_ip_middleware = __commonJS({
-  "dist/links/visitor-ip.middleware.js"(exports2) {
-    "use strict";
-    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
-      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-      return c > 3 && r && Object.defineProperty(target, key, r), r;
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.VisitorIpMiddleware = void 0;
-    var common_1 = require_common();
-    var CLIENT_IP = /^[0-9a-fA-F:.]+$/;
-    var VisitorIpMiddleware = class VisitorIpMiddleware {
-      use(request, _response, next) {
-        const header = request.headers["x-kootahak-client-ip"];
-        const ip = (Array.isArray(header) ? header[0] : header)?.split(",")[0]?.trim();
-        if (ip && ip.length <= 64 && CLIENT_IP.test(ip)) {
-          request.headers["x-forwarded-for"] = ip;
-        }
-        next();
-      }
-    };
-    exports2.VisitorIpMiddleware = VisitorIpMiddleware;
-    exports2.VisitorIpMiddleware = VisitorIpMiddleware = __decorate2([
-      (0, common_1.Injectable)()
-    ], VisitorIpMiddleware);
-  }
-});
-
-// dist/short-code/short-code.module.js
-var require_short_code_module = __commonJS({
-  "dist/short-code/short-code.module.js"(exports2) {
-    "use strict";
-    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
-      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-      return c > 3 && r && Object.defineProperty(target, key, r), r;
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.ShortCodeModule = void 0;
-    var common_1 = require_common();
-    var short_code_service_1 = require_short_code_service();
-    var ShortCodeModule = class ShortCodeModule {
-    };
-    exports2.ShortCodeModule = ShortCodeModule;
-    exports2.ShortCodeModule = ShortCodeModule = __decorate2([
-      (0, common_1.Module)({
-        providers: [short_code_service_1.ShortCodeService],
-        exports: [short_code_service_1.ShortCodeService]
-      })
-    ], ShortCodeModule);
-  }
-});
-
-// dist/redis/redis-options.js
-var require_redis_options2 = __commonJS({
-  "dist/redis/redis-options.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.getRedisOptions = getRedisOptions;
-    exports2.getBullMqConnection = getBullMqConnection;
-    function optionsFromUrl(url) {
-      const parsed = new URL(url);
-      return {
-        host: parsed.hostname,
-        port: parsed.port ? Number(parsed.port) : 6379,
-        username: decodeURIComponent(parsed.username) || void 0,
-        password: decodeURIComponent(parsed.password) || void 0,
-        ...parsed.protocol === "rediss:" ? { tls: {} } : {}
-      };
-    }
-    function getRedisOptions() {
-      const url = process.env.REDIS_URL || process.env.KV_URL;
-      if (url) {
-        return optionsFromUrl(url);
-      }
-      return {
-        host: process.env.REDIS_HOST,
-        port: Number(process.env.REDIS_PORT)
-      };
-    }
-    function getBullMqConnection() {
-      const options = getRedisOptions();
-      return {
-        host: options.host,
-        port: options.port,
-        username: options.username,
-        password: options.password,
-        tls: options.tls,
-        maxRetriesPerRequest: null
-      };
-    }
-  }
-});
-
-// dist/redis/redis.provider.js
-var require_redis_provider = __commonJS({
-  "dist/redis/redis.provider.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.redisProvider = void 0;
-    var redis_constants_1 = require_redis_constants();
-    var redis_options_1 = require_redis_options2();
-    var ioredis_1 = require_built3();
-    exports2.redisProvider = {
-      provide: redis_constants_1.REDIS_CLIENT,
-      useFactory: () => new ioredis_1.Redis((0, redis_options_1.getRedisOptions)())
-    };
-  }
-});
-
-// dist/redis/redis.module.js
-var require_redis_module = __commonJS({
-  "dist/redis/redis.module.js"(exports2) {
-    "use strict";
-    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
-      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-      return c > 3 && r && Object.defineProperty(target, key, r), r;
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.RedisModule = void 0;
-    var common_1 = require_common();
-    var redis_provider_1 = require_redis_provider();
-    var redis_constants_1 = require_redis_constants();
-    var RedisModule = class RedisModule {
-    };
-    exports2.RedisModule = RedisModule;
-    exports2.RedisModule = RedisModule = __decorate2([
-      (0, common_1.Module)({
-        providers: [redis_provider_1.redisProvider],
-        exports: [redis_constants_1.REDIS_CLIENT]
-      })
-    ], RedisModule);
-  }
-});
-
-// dist/bullmq/bullMq.provider.js
-var require_bullMq_provider = __commonJS({
-  "dist/bullmq/bullMq.provider.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.bullMQProvider = void 0;
-    var redis_options_1 = require_redis_options2();
-    var bullMq_constant_1 = require_bullMq_constant();
-    var bullmq_1 = require_cjs4();
-    exports2.bullMQProvider = {
-      provide: bullMq_constant_1.VISIT_QUEUE,
-      useFactory: () => new bullmq_1.Queue("visit", {
-        connection: (0, redis_options_1.getBullMqConnection)()
-      })
-    };
-  }
-});
-
 // node_modules/ip-geolocation-api-sdk-typescript/dist/index.cjs
 var require_dist17 = __commonJS({
   "node_modules/ip-geolocation-api-sdk-typescript/dist/index.cjs"(exports2) {
@@ -186511,22 +185384,54 @@ var require_visits_service = __commonJS({
         const response = await this.GEOService.lookupIpGeolocation(request);
         return response.data;
       }
+      async recordVisit(data) {
+        const { browser, device } = (0, ua_parser_js_1.UAParser)(data.userAgent);
+        return this.prisma.visit.create({
+          data: {
+            linkId: data.id,
+            source: this.getSourceType(data.referer),
+            ipAddress: this.clientIp(data.ip),
+            browser: browser.name,
+            device: device.type ?? "desktop"
+          },
+          select: { id: true }
+        });
+      }
       async visitProcess(data) {
-        const referInfo = this.getSourceType(data.referer);
+        if (data.visitId) {
+          await this.enrichVisit(data.visitId, data.ip);
+          return;
+        }
         const ipInfo = await this.getIPInfo(data.ip);
         const { browser, device } = (0, ua_parser_js_1.UAParser)(data.userAgent);
-        const createdVisit = await this.prisma.visit.create({
+        return this.prisma.visit.create({
           data: {
             linkId: data.id,
             country: ipInfo.location?.countryCode2,
             city: ipInfo.location?.city,
-            source: referInfo,
+            source: this.getSourceType(data.referer),
             ipAddress: ipInfo.ip,
             browser: browser.name,
             device: device.type ?? "desktop"
           }
         });
-        return createdVisit;
+      }
+      async enrichVisit(visitId, ip) {
+        const ipInfo = await this.getIPInfo(ip);
+        await this.prisma.visit.update({
+          where: { id: visitId },
+          data: {
+            country: ipInfo.location?.countryCode2?.slice(0, 2),
+            city: ipInfo.location?.city?.slice(0, 100),
+            ipAddress: ipInfo.ip?.slice(0, 45) ?? this.clientIp(ip)
+          }
+        });
+      }
+      clientIp(ip) {
+        const value = ip?.trim();
+        if (!value || value === "unknown")
+          return void 0;
+        return value.slice(0, 45);
       }
     };
     exports2.VisitsService = VisitsService;
@@ -186539,6 +185444,1144 @@ var require_visits_service = __commonJS({
         ip_geolocation_api_sdk_typescript_1.IpGeolocationClient
       ])
     ], VisitsService);
+  }
+});
+
+// dist/links/validators/is-safe-redirect-url.validator.js
+var require_is_safe_redirect_url_validator = __commonJS({
+  "dist/links/validators/is-safe-redirect-url.validator.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.IsSafeRedirectUrl = IsSafeRedirectUrl;
+    var class_validator_1 = require_cjs();
+    var MAX_URL_LENGTH = 2048;
+    var BLOCKED_HOSTNAMES = /* @__PURE__ */ new Set(["localhost", "127.0.0.1", "0.0.0.0", "::1"]);
+    var PRIVATE_IPV4_PATTERN = /^(10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.)/;
+    function isPrivateHost(hostname) {
+      if (BLOCKED_HOSTNAMES.has(hostname))
+        return true;
+      if (hostname.endsWith(".local"))
+        return true;
+      if (PRIVATE_IPV4_PATTERN.test(hostname))
+        return true;
+      return false;
+    }
+    function isSafeRedirectUrlValue(value) {
+      if (typeof value !== "string" || value.length > MAX_URL_LENGTH)
+        return false;
+      let url;
+      try {
+        url = new URL(value);
+      } catch {
+        return false;
+      }
+      if (url.protocol !== "http:" && url.protocol !== "https:")
+        return false;
+      if (url.username || url.password)
+        return false;
+      if (isPrivateHost(url.hostname))
+        return false;
+      return true;
+    }
+    function IsSafeRedirectUrl(options) {
+      return function(object, propertyName) {
+        (0, class_validator_1.registerDecorator)({
+          name: "isSafeRedirectUrl",
+          target: object.constructor,
+          propertyName,
+          options,
+          validator: {
+            validate: isSafeRedirectUrlValue,
+            defaultMessage: () => "\u0627\u06CC\u0646 \u0622\u062F\u0631\u0633 \u0645\u062C\u0627\u0632 \u0646\u06CC\u0633\u062A"
+          }
+        });
+      };
+    }
+  }
+});
+
+// dist/links/dto/index.js
+var require_dto2 = __commonJS({
+  "dist/links/dto/index.js"(exports2) {
+    "use strict";
+    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
+      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    var __metadata2 = exports2 && exports2.__metadata || function(k, v) {
+      if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.UpdateLinkDto = exports2.getLinkDto = exports2.SetActiveLinkDto = exports2.SetPinLinkDto = exports2.GetLinksQueryDto = exports2.SortDto = exports2.SearchDto = exports2.FilterDto = exports2.PaginationDto = exports2.SortOrder = exports2.LinkSortBy = exports2.CreateLinkDto = void 0;
+    var swagger_1 = require_dist15();
+    var class_transformer_1 = require_cjs2();
+    var class_validator_1 = require_cjs();
+    var is_safe_redirect_url_validator_1 = require_is_safe_redirect_url_validator();
+    var CreateLinkDto = class {
+      originalUrl;
+      suggestedCode;
+      title;
+      expiresAt;
+    };
+    exports2.CreateLinkDto = CreateLinkDto;
+    __decorate2([
+      (0, swagger_1.ApiProperty)({
+        description: "URL to shorten. Must use http:// or https://, no username/password in the URL, and no localhost/private/internal addresses.",
+        example: "https://myShop.com/myProduct",
+        maxLength: 2048
+      }),
+      (0, class_validator_1.IsNotEmpty)({ message: "\u0644\u06CC\u0646\u06A9 \u0648\u0631\u0648\u062F\u06CC \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
+      (0, class_validator_1.IsUrl)({ require_protocol: true }, { message: "\u0644\u06CC\u0646\u06A9 \u0628\u0627\u06CC\u062F \u0628\u0627 http:// \u06CC\u0627 https:// \u0634\u0631\u0648\u0639 \u0634\u0648\u062F" }),
+      (0, is_safe_redirect_url_validator_1.IsSafeRedirectUrl)(),
+      __metadata2("design:type", String)
+    ], CreateLinkDto.prototype, "originalUrl", void 0);
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "User suggested code for shortening",
+        example: "xc2z9",
+        minLength: 4,
+        maxLength: 20
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_validator_1.IsString)({ message: "\u06A9\u062F \u067E\u06CC\u0634\u0646\u0647\u0627\u062F\u06CC \u0628\u0627\u06CC\u062F \u0645\u062A\u0646 \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.MinLength)(4, { message: "\u06A9\u062F \u067E\u06CC\u0634\u0646\u0647\u0627\u062F\u06CC \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u0642\u0644 4 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.MaxLength)(20, { message: "\u06A9\u062F \u067E\u06CC\u0634\u0646\u0647\u0627\u062F\u06CC \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u06A9\u062B\u0631 20 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.Matches)(/^[a-zA-Z0-9_-]+$/, {
+        message: "\u06A9\u062F \u067E\u06CC\u0634\u0646\u0647\u0627\u062F\u06CC \u0641\u0642\u0637 \u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u062F \u0634\u0627\u0645\u0644 \u062D\u0631\u0648\u0641\u060C \u0639\u062F\u062F\u060C \u062E\u0637 \u062A\u06CC\u0631\u0647 \u0648 \u0622\u0646\u062F\u0631\u0644\u0627\u06CC\u0646 \u0628\u0627\u0634\u062F"
+      }),
+      __metadata2("design:type", String)
+    ], CreateLinkDto.prototype, "suggestedCode", void 0);
+    __decorate2([
+      (0, swagger_1.ApiProperty)({
+        description: "Title for the shortened link",
+        example: "My Shop Product Page",
+        maxLength: 255
+      }),
+      (0, class_validator_1.IsNotEmpty)({ message: "\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
+      (0, class_validator_1.IsString)({ message: "\u0639\u0646\u0648\u0627\u0646 \u0628\u0627\u06CC\u062F \u0645\u062A\u0646 \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.MaxLength)(255, { message: "\u0639\u0646\u0648\u0627\u0646 \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u06A9\u062B\u0631 255 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
+      __metadata2("design:type", String)
+    ], CreateLinkDto.prototype, "title", void 0);
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "Link expiration date/time (ISO 8601)",
+        example: "2026-12-31T23:59:59.000Z"
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_validator_1.IsDateString)({}, { message: "\u062A\u0627\u0631\u06CC\u062E \u0627\u0646\u0642\u0636\u0627 \u0628\u0627\u06CC\u062F \u062F\u0631 \u0642\u0627\u0644\u0628 \u0645\u0639\u062A\u0628\u0631 \u062A\u0627\u0631\u06CC\u062E \u0628\u0627\u0634\u062F" }),
+      __metadata2("design:type", String)
+    ], CreateLinkDto.prototype, "expiresAt", void 0);
+    var LinkSortBy;
+    (function(LinkSortBy2) {
+      LinkSortBy2["CREATED_AT"] = "createdAt";
+      LinkSortBy2["EXPIRES_AT"] = "expiresAt";
+    })(LinkSortBy || (exports2.LinkSortBy = LinkSortBy = {}));
+    var SortOrder;
+    (function(SortOrder2) {
+      SortOrder2["ASC"] = "asc";
+      SortOrder2["DESC"] = "desc";
+    })(SortOrder || (exports2.SortOrder = SortOrder = {}));
+    var PaginationDto = class {
+      limit = 10;
+      offset = 0;
+    };
+    exports2.PaginationDto = PaginationDto;
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "Number of items per page",
+        example: 10,
+        default: 10,
+        minimum: 1,
+        maximum: 50
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_transformer_1.Type)(() => Number),
+      (0, class_validator_1.IsInt)({ message: "limit \u0628\u0627\u06CC\u062F \u0639\u062F\u062F \u0635\u062D\u06CC\u062D \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.Min)(1, { message: "limit \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u0642\u0644 1 \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.Max)(50, { message: "limit \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u06A9\u062B\u0631 50 \u0628\u0627\u0634\u062F" }),
+      __metadata2("design:type", Number)
+    ], PaginationDto.prototype, "limit", void 0);
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "Number of items to skip from the start of the list",
+        example: 0,
+        default: 0,
+        minimum: 0
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_transformer_1.Type)(() => Number),
+      (0, class_validator_1.IsInt)({ message: "offset \u0628\u0627\u06CC\u062F \u0639\u062F\u062F \u0635\u062D\u06CC\u062D \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.Min)(0, { message: "offset \u0646\u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u062F \u0645\u0646\u0641\u06CC \u0628\u0627\u0634\u062F" }),
+      __metadata2("design:type", Number)
+    ], PaginationDto.prototype, "offset", void 0);
+    var toBoolean = ({ value }) => {
+      if (value === "true")
+        return true;
+      if (value === "false")
+        return false;
+      return value;
+    };
+    var FilterDto = class {
+      isActive;
+      isPin;
+      expired;
+    };
+    exports2.FilterDto = FilterDto;
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "Filter by whether the link is active",
+        example: true
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_transformer_1.Transform)(toBoolean),
+      (0, class_validator_1.IsBoolean)({ message: "isActive \u0628\u0627\u06CC\u062F \u0645\u0642\u062F\u0627\u0631 \u062F\u0631\u0633\u062A \u06CC\u0627 \u0646\u0627\u062F\u0631\u0633\u062A \u0628\u0627\u0634\u062F" }),
+      __metadata2("design:type", Boolean)
+    ], FilterDto.prototype, "isActive", void 0);
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "Filter by whether the link is pinned",
+        example: true
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_transformer_1.Transform)(toBoolean),
+      (0, class_validator_1.IsBoolean)({ message: "isPin \u0628\u0627\u06CC\u062F \u0645\u0642\u062F\u0627\u0631 \u062F\u0631\u0633\u062A \u06CC\u0627 \u0646\u0627\u062F\u0631\u0633\u062A \u0628\u0627\u0634\u062F" }),
+      __metadata2("design:type", Boolean)
+    ], FilterDto.prototype, "isPin", void 0);
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "Filter by whether the link has expired (true: expired, false: valid or unlimited)",
+        example: false
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_transformer_1.Transform)(toBoolean),
+      (0, class_validator_1.IsBoolean)({ message: "expired \u0628\u0627\u06CC\u062F \u0645\u0642\u062F\u0627\u0631 \u062F\u0631\u0633\u062A \u06CC\u0627 \u0646\u0627\u062F\u0631\u0633\u062A \u0628\u0627\u0634\u062F" }),
+      __metadata2("design:type", Boolean)
+    ], FilterDto.prototype, "expired", void 0);
+    var SearchDto = class {
+      search;
+    };
+    exports2.SearchDto = SearchDto;
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "Search in title and original URL",
+        example: "myShop",
+        maxLength: 255
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_validator_1.IsString)({ message: "search \u0628\u0627\u06CC\u062F \u0645\u062A\u0646 \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.MaxLength)(255, { message: "search \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u06A9\u062B\u0631 255 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
+      __metadata2("design:type", String)
+    ], SearchDto.prototype, "search", void 0);
+    var SortDto = class {
+      sortBy = LinkSortBy.CREATED_AT;
+      sortOrder = SortOrder.DESC;
+    };
+    exports2.SortDto = SortDto;
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "Field to sort by",
+        enum: LinkSortBy,
+        default: LinkSortBy.CREATED_AT
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_validator_1.IsEnum)(LinkSortBy, { message: "sortBy \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A" }),
+      __metadata2("design:type", String)
+    ], SortDto.prototype, "sortBy", void 0);
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "Sort direction",
+        enum: SortOrder,
+        default: SortOrder.DESC
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_validator_1.IsEnum)(SortOrder, { message: "sortOrder \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A" }),
+      __metadata2("design:type", String)
+    ], SortDto.prototype, "sortOrder", void 0);
+    var GetLinksQueryDto = class extends (0, swagger_1.IntersectionType)(PaginationDto, FilterDto, SortDto, SearchDto) {
+    };
+    exports2.GetLinksQueryDto = GetLinksQueryDto;
+    var SetPinLinkDto = class {
+      linkId;
+      isPin;
+    };
+    exports2.SetPinLinkDto = SetPinLinkDto;
+    __decorate2([
+      (0, swagger_1.ApiProperty)({
+        description: "Id of the link to pin/unpin",
+        example: 1
+      }),
+      (0, class_validator_1.IsNotEmpty)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
+      (0, class_validator_1.IsInt)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0628\u0627\u06CC\u062F \u0639\u062F\u062F \u0635\u062D\u06CC\u062D \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.IsPositive)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A" }),
+      __metadata2("design:type", Number)
+    ], SetPinLinkDto.prototype, "linkId", void 0);
+    __decorate2([
+      (0, swagger_1.ApiProperty)({
+        description: "Whether the link should be pinned",
+        example: true
+      }),
+      (0, class_validator_1.IsNotEmpty)({ message: "\u0648\u0636\u0639\u06CC\u062A \u067E\u06CC\u0646 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
+      (0, class_validator_1.IsBoolean)({ message: "\u0648\u0636\u0639\u06CC\u062A \u067E\u06CC\u0646 \u0628\u0627\u06CC\u062F \u0645\u0642\u062F\u0627\u0631 \u062F\u0631\u0633\u062A \u06CC\u0627 \u0646\u0627\u062F\u0631\u0633\u062A \u0628\u0627\u0634\u062F" }),
+      __metadata2("design:type", Boolean)
+    ], SetPinLinkDto.prototype, "isPin", void 0);
+    var SetActiveLinkDto = class {
+      linkId;
+      isActive;
+    };
+    exports2.SetActiveLinkDto = SetActiveLinkDto;
+    __decorate2([
+      (0, swagger_1.ApiProperty)({
+        description: "Id of the link to activate/deactivate",
+        example: 1
+      }),
+      (0, class_validator_1.IsNotEmpty)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
+      (0, class_validator_1.IsInt)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0628\u0627\u06CC\u062F \u0639\u062F\u062F \u0635\u062D\u06CC\u062D \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.IsPositive)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A" }),
+      __metadata2("design:type", Number)
+    ], SetActiveLinkDto.prototype, "linkId", void 0);
+    __decorate2([
+      (0, swagger_1.ApiProperty)({
+        description: "Whether the link should be active",
+        example: true
+      }),
+      (0, class_validator_1.IsNotEmpty)({ message: "\u0648\u0636\u0639\u06CC\u062A \u0641\u0639\u0627\u0644 \u0628\u0648\u062F\u0646 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
+      (0, class_validator_1.IsBoolean)({ message: "\u0648\u0636\u0639\u06CC\u062A \u0641\u0639\u0627\u0644 \u0628\u0648\u062F\u0646 \u0628\u0627\u06CC\u062F \u0645\u0642\u062F\u0627\u0631 \u062F\u0631\u0633\u062A \u06CC\u0627 \u0646\u0627\u062F\u0631\u0633\u062A \u0628\u0627\u0634\u062F" }),
+      __metadata2("design:type", Boolean)
+    ], SetActiveLinkDto.prototype, "isActive", void 0);
+    var getLinkDto = class {
+      shortCode;
+    };
+    exports2.getLinkDto = getLinkDto;
+    __decorate2([
+      (0, swagger_1.ApiProperty)({
+        description: "short code",
+        example: "user short code"
+      }),
+      (0, class_validator_1.IsNotEmpty)({ message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
+      (0, class_validator_1.IsString)({ message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0628\u0627\u06CC\u062F \u0645\u062A\u0646 \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.Matches)(/^[A-Za-z0-9_-]{4,20}$/, { message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A" }),
+      __metadata2("design:type", String)
+    ], getLinkDto.prototype, "shortCode", void 0);
+    var UpdateLinkDto = class {
+      linkId;
+      title;
+      shortCode;
+      originalUrl;
+      expiresAt;
+    };
+    exports2.UpdateLinkDto = UpdateLinkDto;
+    __decorate2([
+      (0, swagger_1.ApiProperty)({
+        description: "Id of the link to update",
+        example: 1
+      }),
+      (0, class_validator_1.IsNotEmpty)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0627\u0644\u0632\u0627\u0645\u06CC \u0627\u0633\u062A" }),
+      (0, class_validator_1.IsInt)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0628\u0627\u06CC\u062F \u0639\u062F\u062F \u0635\u062D\u06CC\u062D \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.IsPositive)({ message: "\u0634\u0646\u0627\u0633\u0647 \u0644\u06CC\u0646\u06A9 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A" }),
+      __metadata2("design:type", Number)
+    ], UpdateLinkDto.prototype, "linkId", void 0);
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "Title for the shortened link",
+        example: "My Shop Product Page",
+        maxLength: 255
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_validator_1.IsNotEmpty)({ message: "\u0639\u0646\u0648\u0627\u0646 \u0646\u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u062F \u062E\u0627\u0644\u06CC \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.IsString)({ message: "\u0639\u0646\u0648\u0627\u0646 \u0628\u0627\u06CC\u062F \u0645\u062A\u0646 \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.MaxLength)(255, { message: "\u0639\u0646\u0648\u0627\u0646 \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u06A9\u062B\u0631 255 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
+      __metadata2("design:type", String)
+    ], UpdateLinkDto.prototype, "title", void 0);
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "New short code for the link",
+        example: "xc2z9",
+        minLength: 4,
+        maxLength: 20
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_validator_1.IsString)({ message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0628\u0627\u06CC\u062F \u0645\u062A\u0646 \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.MinLength)(4, { message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u0642\u0644 4 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.MaxLength)(20, { message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0628\u0627\u06CC\u062F \u062D\u062F\u0627\u06A9\u062B\u0631 20 \u06A9\u0627\u0631\u0627\u06A9\u062A\u0631 \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.Matches)(/^[a-zA-Z0-9_-]+$/, {
+        message: "\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0641\u0642\u0637 \u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u062F \u0634\u0627\u0645\u0644 \u062D\u0631\u0648\u0641\u060C \u0639\u062F\u062F\u060C \u062E\u0637 \u062A\u06CC\u0631\u0647 \u0648 \u0622\u0646\u062F\u0631\u0644\u0627\u06CC\u0646 \u0628\u0627\u0634\u062F"
+      }),
+      __metadata2("design:type", String)
+    ], UpdateLinkDto.prototype, "shortCode", void 0);
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "URL to shorten. Must use http:// or https://, no username/password in the URL, and no localhost/private/internal addresses.",
+        example: "https://myShop.com/myProduct",
+        maxLength: 2048
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_validator_1.IsNotEmpty)({ message: "\u0644\u06CC\u0646\u06A9 \u0648\u0631\u0648\u062F\u06CC \u0646\u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u062F \u062E\u0627\u0644\u06CC \u0628\u0627\u0634\u062F" }),
+      (0, class_validator_1.IsUrl)({ require_protocol: true }, { message: "\u0644\u06CC\u0646\u06A9 \u0628\u0627\u06CC\u062F \u0628\u0627 http:// \u06CC\u0627 https:// \u0634\u0631\u0648\u0639 \u0634\u0648\u062F" }),
+      (0, is_safe_redirect_url_validator_1.IsSafeRedirectUrl)(),
+      __metadata2("design:type", String)
+    ], UpdateLinkDto.prototype, "originalUrl", void 0);
+    __decorate2([
+      (0, swagger_1.ApiPropertyOptional)({
+        description: "Link expiration date/time (ISO 8601)",
+        example: "2026-12-31T23:59:59.000Z"
+      }),
+      (0, class_validator_1.IsOptional)(),
+      (0, class_validator_1.IsDateString)({}, { message: "\u062A\u0627\u0631\u06CC\u062E \u0627\u0646\u0642\u0636\u0627 \u0628\u0627\u06CC\u062F \u062F\u0631 \u0642\u0627\u0644\u0628 \u0645\u0639\u062A\u0628\u0631 \u062A\u0627\u0631\u06CC\u062E \u0628\u0627\u0634\u062F" }),
+      __metadata2("design:type", String)
+    ], UpdateLinkDto.prototype, "expiresAt", void 0);
+  }
+});
+
+// dist/links/links.service.js
+var require_links_service = __commonJS({
+  "dist/links/links.service.js"(exports2) {
+    "use strict";
+    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
+      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    var __metadata2 = exports2 && exports2.__metadata || function(k, v) {
+      if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+    };
+    var __param2 = exports2 && exports2.__param || function(paramIndex, decorator) {
+      return function(target, key) {
+        decorator(target, key, paramIndex);
+      };
+    };
+    var __importDefault2 = exports2 && exports2.__importDefault || function(mod) {
+      return mod && mod.__esModule ? mod : { "default": mod };
+    };
+    var LinksService_1;
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.LinksService = void 0;
+    var common_1 = require_common();
+    var bullmq_1 = require_cjs4();
+    var ioredis_1 = __importDefault2(require_built3());
+    var nestjs_pino_1 = require_nestjs_pino();
+    var bullMq_constant_1 = require_bullMq_constant();
+    var client_1 = require_client4();
+    var prisma_service_1 = require_prisma_service();
+    var redis_constants_1 = require_redis_constants();
+    var short_code_service_1 = require_short_code_service();
+    var visits_service_1 = require_visits_service();
+    var dto_1 = require_dto2();
+    var MAX_GENERATION_ATTEMPTS = 5;
+    var UNIQUE_CONSTRAINT_ERROR_CODE = "P2002";
+    var LinksService = LinksService_1 = class LinksService {
+      redis;
+      bullMQ;
+      prisma;
+      shortCodeService;
+      visitsService;
+      logger;
+      constructor(redis, bullMQ, prisma, shortCodeService, visitsService, logger) {
+        this.redis = redis;
+        this.bullMQ = bullMQ;
+        this.prisma = prisma;
+        this.shortCodeService = shortCodeService;
+        this.visitsService = visitsService;
+        this.logger = logger;
+        this.logger.setContext(LinksService_1.name);
+      }
+      async getUserAllLinks(user, query = {}) {
+        const { limit = 10, offset = 0 } = query;
+        const sortBy = query.sortBy ?? dto_1.LinkSortBy.CREATED_AT;
+        const sortOrder = query.sortOrder ?? dto_1.SortOrder.DESC;
+        let expiredCondition = {};
+        let searchCondition = {};
+        let orderByCondition = {};
+        if (query.expired === true) {
+          expiredCondition = { expiresAt: { lte: /* @__PURE__ */ new Date() } };
+        } else if (query.expired === false) {
+          expiredCondition = {
+            OR: [{ expiresAt: null }, { expiresAt: { gt: /* @__PURE__ */ new Date() } }]
+          };
+        }
+        if (query.search) {
+          searchCondition = {
+            OR: [
+              { title: { contains: query.search, mode: "insensitive" } },
+              { originalUrl: { contains: query.search, mode: "insensitive" } }
+            ]
+          };
+        }
+        const noFilterOrSortRequested = query.sortBy === void 0 && query.isActive === void 0 && query.isPin === void 0 && query.expired === void 0;
+        if (noFilterOrSortRequested) {
+          orderByCondition = [
+            { isPin: dto_1.SortOrder.DESC },
+            { isActive: dto_1.SortOrder.DESC },
+            { createdAt: dto_1.SortOrder.DESC },
+            { id: dto_1.SortOrder.DESC }
+          ];
+        } else {
+          orderByCondition = sortBy === dto_1.LinkSortBy.CREATED_AT ? [{ createdAt: sortOrder }, { id: sortOrder }] : [
+            { expiresAt: { sort: sortOrder, nulls: "last" } },
+            { id: sortOrder }
+          ];
+        }
+        const whereCondition = {
+          isActive: query.isActive,
+          isPin: query.isPin,
+          authorId: user.id,
+          AND: [searchCondition, expiredCondition],
+          deletedAt: null
+        };
+        const [links, totalCount] = await Promise.all([
+          this.prisma.link.findMany({
+            skip: offset,
+            take: limit,
+            where: whereCondition,
+            orderBy: orderByCondition
+          }),
+          this.prisma.link.count({
+            where: whereCondition
+          })
+        ]);
+        return {
+          links,
+          totalCount,
+          limit,
+          offset,
+          totalPages: Math.ceil(totalCount / limit)
+        };
+      }
+      async getStatistics() {
+        const totalActiveLinks = await this.prisma.link.count({
+          where: { isActive: true, deletedAt: null }
+        });
+        const totalVisits = await this.prisma.visit.count();
+        const totalActiveUsers = await this.prisma.user.count();
+        return {
+          totalActiveLinks,
+          totalVisits,
+          totalActiveUsers
+        };
+      }
+      async createUserLink(createData, author) {
+        const shortCode = createData.suggestedCode ? await this.reserveSuggestedCode(createData.suggestedCode) : void 0;
+        const data = {
+          author: { connect: { id: author.id } },
+          originalUrl: createData.originalUrl,
+          title: createData.title,
+          expiresAt: createData.expiresAt
+        };
+        if (shortCode) {
+          return this.prisma.link.create({ data: { ...data, shortCode } });
+        }
+        return this.createWithGeneratedCode(data);
+      }
+      async reserveSuggestedCode(suggestedCode) {
+        const existingLink = await this.prisma.link.findUnique({
+          where: { shortCode: suggestedCode },
+          select: { id: true }
+        });
+        if (existingLink) {
+          throw new common_1.ConflictException("\u0627\u06CC\u0646 \u06A9\u062F \u0642\u0628\u0644\u0627 \u0627\u0633\u062A\u0641\u0627\u062F\u0647 \u0634\u062F\u0647 \u0627\u0633\u062A");
+        }
+        return suggestedCode;
+      }
+      async createWithGeneratedCode(data) {
+        const totalLinks = await this.prisma.link.count();
+        const codeLength = this.calculateCodeLength(totalLinks);
+        for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
+          const shortCode = this.shortCodeService.generate(codeLength);
+          try {
+            return await this.prisma.link.create({ data: { ...data, shortCode } });
+          } catch (err) {
+            if (this.isUniqueConstraintViolation(err)) {
+              continue;
+            }
+            throw err;
+          }
+        }
+        throw new common_1.InternalServerErrorException("\u0627\u0645\u06A9\u0627\u0646 \u0633\u0627\u062E\u062A \u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u06CC\u06A9\u062A\u0627 \u0648\u062C\u0648\u062F \u0646\u062F\u0627\u0634\u062A\u060C \u062F\u0648\u0628\u0627\u0631\u0647 \u062A\u0644\u0627\u0634 \u06A9\u0646\u06CC\u062F");
+      }
+      calculateCodeLength(totalLinks) {
+        if (totalLinks < 1e3)
+          return 4;
+        if (totalLinks < 1e5)
+          return 5;
+        if (totalLinks < 5e6)
+          return 6;
+        return 7;
+      }
+      isUniqueConstraintViolation(err) {
+        return err instanceof client_1.Prisma.PrismaClientKnownRequestError && err.code === UNIQUE_CONSTRAINT_ERROR_CODE;
+      }
+      async visitLink(userRequest, getData) {
+        const shortCodeExistString = await this.redis.get(`link:${getData.shortCode}`);
+        let userData;
+        if (shortCodeExistString) {
+          const shortCodeExist = JSON.parse(shortCodeExistString);
+          userData = shortCodeExist;
+        } else {
+          const link = await this.prisma.link.findFirst({
+            where: {
+              shortCode: getData.shortCode,
+              isActive: true,
+              deletedAt: null,
+              OR: [{ expiresAt: null }, { expiresAt: { gt: /* @__PURE__ */ new Date() } }]
+            }
+          });
+          if (!link) {
+            throw new common_1.NotFoundException("\u06A9\u062F \u06A9\u0648\u062A\u0627\u0647 \u0646\u0627\u0645\u0639\u0628\u062A\u0631 \u0627\u0633\u062A.");
+          }
+          userData = { id: link.id, originalUrl: link.originalUrl };
+          await this.redis.set(`link:${link?.shortCode}`, JSON.stringify({ id: link.id, originalUrl: link.originalUrl }), "EX", redis_constants_1.LINK_CACHE_TTL_SECONDS, "NX");
+        }
+        const visit = { ...userRequest, ...userData };
+        let visitId;
+        try {
+          visitId = (await this.visitsService.recordVisit(visit)).id;
+        } catch (err) {
+          this.logger.error({ err, shortCode: getData.shortCode }, "failed to record visit before redirect");
+        }
+        this.bullMQ.add("recordVisit", { ...visit, visitId }, {
+          removeOnComplete: 100,
+          removeOnFail: 100,
+          attempts: 3,
+          backoff: {
+            type: "exponential",
+            delay: 1e3
+          }
+        }).catch((err) => {
+          this.logger.error({ err, shortCode: getData.shortCode }, "failed to enqueue visit-processing job");
+        });
+        return userData.originalUrl;
+      }
+      async setPinLink(updateData, user) {
+        const linkData = await this.prisma.link.findUnique({
+          where: { id: updateData.linkId }
+        });
+        if (!linkData) {
+          throw new common_1.NotFoundException("\u0644\u06CC\u0646\u06A9 \u0634\u0645\u0627 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A.");
+        }
+        if (linkData.authorId !== user.id) {
+          throw new common_1.ForbiddenException("\u0634\u0645\u0627 \u062F\u0633\u062A\u0631\u0633\u06CC \u0628\u0647 \u0627\u06CC\u0646 \u0644\u06CC\u0646\u06A9 \u0646\u062F\u0627\u0631\u06CC\u062F.");
+        }
+        return this.prisma.link.update({
+          where: { id: updateData.linkId },
+          data: { isPin: updateData.isPin }
+        });
+      }
+      async setActiveLink(updateData, user) {
+        const linkData = await this.prisma.link.findUnique({
+          where: { id: updateData.linkId }
+        });
+        if (!linkData) {
+          throw new common_1.NotFoundException("\u0644\u06CC\u0646\u06A9 \u0634\u0645\u0627 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A.");
+        }
+        if (linkData.authorId !== user.id) {
+          throw new common_1.ForbiddenException("\u0634\u0645\u0627 \u062F\u0633\u062A\u0631\u0633\u06CC \u0628\u0647 \u0627\u06CC\u0646 \u0644\u06CC\u0646\u06A9 \u0646\u062F\u0627\u0631\u06CC\u062F.");
+        }
+        const updatedLink = await this.prisma.link.update({
+          where: { id: updateData.linkId },
+          data: { isActive: updateData.isActive }
+        });
+        await this.redis.del(`link:${linkData.shortCode}`);
+        return updatedLink;
+      }
+      async deleteLink(linkId, user) {
+        const linkData = await this.prisma.link.findUnique({
+          where: { id: linkId }
+        });
+        if (!linkData) {
+          throw new common_1.NotFoundException("\u0644\u06CC\u0646\u06A9 \u0634\u0645\u0627 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A.");
+        }
+        if (linkData.authorId !== user.id) {
+          throw new common_1.ForbiddenException("\u0634\u0645\u0627 \u062F\u0633\u062A\u0631\u0633\u06CC \u0628\u0647 \u0627\u06CC\u0646 \u0644\u06CC\u0646\u06A9 \u0646\u062F\u0627\u0631\u06CC\u062F.");
+        }
+        const deletedLink = await this.prisma.link.update({
+          where: { id: linkId },
+          data: { deletedAt: /* @__PURE__ */ new Date() }
+        });
+        await this.redis.del(`link:${linkData.shortCode}`);
+        return deletedLink;
+      }
+      async updateLink(updateData, user) {
+        const linkData = await this.prisma.link.findUnique({
+          where: { id: updateData.linkId }
+        });
+        if (!linkData) {
+          throw new common_1.NotFoundException("\u0644\u06CC\u0646\u06A9 \u0634\u0645\u0627 \u0646\u0627\u0645\u0639\u062A\u0628\u0631 \u0627\u0633\u062A.");
+        }
+        if (linkData.authorId !== user.id) {
+          throw new common_1.ForbiddenException("\u0634\u0645\u0627 \u062F\u0633\u062A\u0631\u0633\u06CC \u0628\u0647 \u0627\u06CC\u0646 \u0644\u06CC\u0646\u06A9 \u0646\u062F\u0627\u0631\u06CC\u062F.");
+        }
+        let newShortCode;
+        if (updateData.shortCode && updateData.shortCode !== linkData.shortCode) {
+          newShortCode = await this.reserveSuggestedCode(updateData.shortCode);
+        }
+        if (updateData.originalUrl !== void 0 || newShortCode !== void 0) {
+          await this.redis.del(`link:${linkData?.shortCode}`);
+        }
+        return await this.prisma.link.update({
+          where: { id: updateData.linkId },
+          data: {
+            title: updateData.title,
+            originalUrl: updateData.originalUrl,
+            expiresAt: updateData.expiresAt,
+            shortCode: newShortCode
+          }
+        });
+      }
+    };
+    exports2.LinksService = LinksService;
+    exports2.LinksService = LinksService = LinksService_1 = __decorate2([
+      (0, common_1.Injectable)(),
+      __param2(0, (0, common_1.Inject)(redis_constants_1.REDIS_CLIENT)),
+      __param2(1, (0, common_1.Inject)(bullMq_constant_1.VISIT_QUEUE)),
+      __metadata2("design:paramtypes", [
+        ioredis_1.default,
+        bullmq_1.Queue,
+        prisma_service_1.PrismaService,
+        short_code_service_1.ShortCodeService,
+        visits_service_1.VisitsService,
+        nestjs_pino_1.PinoLogger
+      ])
+    ], LinksService);
+  }
+});
+
+// dist/links/links.controller.js
+var require_links_controller = __commonJS({
+  "dist/links/links.controller.js"(exports2) {
+    "use strict";
+    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
+      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    var __metadata2 = exports2 && exports2.__metadata || function(k, v) {
+      if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+    };
+    var __param2 = exports2 && exports2.__param || function(paramIndex, decorator) {
+      return function(target, key) {
+        decorator(target, key, paramIndex);
+      };
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.LinksController = void 0;
+    var common_1 = require_common();
+    var swagger_1 = require_dist15();
+    var links_service_1 = require_links_service();
+    var dto_1 = require_dto2();
+    var throttler_1 = require_dist13();
+    var jwt_auth_guard_1 = require_jwt_auth_guard();
+    var current_user_decorator_1 = require_current_user_decorator();
+    var LinksController = class LinksController {
+      linksService;
+      constructor(linksService) {
+        this.linksService = linksService;
+      }
+      async getStatistics() {
+        return await this.linksService.getStatistics();
+      }
+      async getUserLinks(user, query) {
+        return await this.linksService.getUserAllLinks(user, query);
+      }
+      createLink(createLinkDto, user) {
+        return this.linksService.createUserLink(createLinkDto, user);
+      }
+      async setPinLink(updateData, user) {
+        return await this.linksService.setPinLink(updateData, user);
+      }
+      async setActiveLink(updateData, user) {
+        return await this.linksService.setActiveLink(updateData, user);
+      }
+      async updateLink(updateData, user) {
+        return await this.linksService.updateLink(updateData, user);
+      }
+      async deleteLink(linkId, user) {
+        return await this.linksService.deleteLink(linkId, user);
+      }
+    };
+    exports2.LinksController = LinksController;
+    __decorate2([
+      (0, common_1.Get)("statistics"),
+      (0, throttler_1.Throttle)({ default: { limit: 30, ttl: 6e4 } }),
+      (0, swagger_1.ApiOperation)({ summary: "Get public platform-wide usage statistics" }),
+      (0, swagger_1.ApiOkResponse)({
+        description: "Aggregate counts of active links, visits, and active users"
+      }),
+      __metadata2("design:type", Function),
+      __metadata2("design:paramtypes", []),
+      __metadata2("design:returntype", Promise)
+    ], LinksController.prototype, "getStatistics", null);
+    __decorate2([
+      (0, common_1.Get)(),
+      (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+      (0, swagger_1.ApiOperation)({ summary: "List links owned by the current user" }),
+      (0, swagger_1.ApiOkResponse)({ description: "A paginated list of the user's links" }),
+      (0, swagger_1.ApiBadRequestResponse)({
+        description: "Invalid pagination, filter, sort, or search query params"
+      }),
+      (0, swagger_1.ApiUnauthorizedResponse)({ description: "Missing or invalid authentication" }),
+      __param2(0, (0, current_user_decorator_1.CurrentUser)()),
+      __param2(1, (0, common_1.Query)()),
+      __metadata2("design:type", Function),
+      __metadata2("design:paramtypes", [Object, dto_1.GetLinksQueryDto]),
+      __metadata2("design:returntype", Promise)
+    ], LinksController.prototype, "getUserLinks", null);
+    __decorate2([
+      (0, common_1.Post)(),
+      (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+      (0, throttler_1.Throttle)({ default: { limit: 20, ttl: 6e4 } }),
+      (0, swagger_1.ApiOperation)({ summary: "Create a new shortened link for the current user" }),
+      (0, swagger_1.ApiCreatedResponse)({ description: "The link was created successfully" }),
+      (0, swagger_1.ApiConflictResponse)({
+        description: "The suggested short code is already in use"
+      }),
+      (0, swagger_1.ApiBadRequestResponse)({
+        description: "Invalid input, e.g. originalUrl is not http(s), has credentials in it, or points to a localhost/private/internal address"
+      }),
+      (0, swagger_1.ApiUnauthorizedResponse)({ description: "Missing or invalid authentication" }),
+      __param2(0, (0, common_1.Body)()),
+      __param2(1, (0, current_user_decorator_1.CurrentUser)()),
+      __metadata2("design:type", Function),
+      __metadata2("design:paramtypes", [dto_1.CreateLinkDto, Object]),
+      __metadata2("design:returntype", void 0)
+    ], LinksController.prototype, "createLink", null);
+    __decorate2([
+      (0, common_1.Patch)("pin"),
+      (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+      (0, throttler_1.Throttle)({ default: { limit: 20, ttl: 6e4 } }),
+      (0, swagger_1.ApiOperation)({ summary: "Pin or unpin a link owned by the current user" }),
+      (0, swagger_1.ApiOkResponse)({ description: "The link's pin state was updated" }),
+      (0, swagger_1.ApiBadRequestResponse)({ description: "Invalid linkId or isPin value" }),
+      (0, swagger_1.ApiUnauthorizedResponse)({ description: "Missing or invalid authentication" }),
+      (0, swagger_1.ApiForbiddenResponse)({ description: "The link belongs to another user" }),
+      (0, swagger_1.ApiNotFoundResponse)({ description: "No link exists with the given linkId" }),
+      __param2(0, (0, common_1.Body)()),
+      __param2(1, (0, current_user_decorator_1.CurrentUser)()),
+      __metadata2("design:type", Function),
+      __metadata2("design:paramtypes", [dto_1.SetPinLinkDto, Object]),
+      __metadata2("design:returntype", Promise)
+    ], LinksController.prototype, "setPinLink", null);
+    __decorate2([
+      (0, common_1.Patch)("active"),
+      (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+      (0, throttler_1.Throttle)({ default: { limit: 20, ttl: 6e4 } }),
+      (0, swagger_1.ApiOperation)({
+        summary: "Activate or deactivate a link owned by the current user"
+      }),
+      (0, swagger_1.ApiOkResponse)({ description: "The link's active state was updated" }),
+      (0, swagger_1.ApiBadRequestResponse)({ description: "Invalid linkId or isActive value" }),
+      (0, swagger_1.ApiUnauthorizedResponse)({ description: "Missing or invalid authentication" }),
+      (0, swagger_1.ApiForbiddenResponse)({ description: "The link belongs to another user" }),
+      (0, swagger_1.ApiNotFoundResponse)({ description: "No link exists with the given linkId" }),
+      __param2(0, (0, common_1.Body)()),
+      __param2(1, (0, current_user_decorator_1.CurrentUser)()),
+      __metadata2("design:type", Function),
+      __metadata2("design:paramtypes", [dto_1.SetActiveLinkDto, Object]),
+      __metadata2("design:returntype", Promise)
+    ], LinksController.prototype, "setActiveLink", null);
+    __decorate2([
+      (0, common_1.Put)(),
+      (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+      (0, throttler_1.Throttle)({ default: { limit: 20, ttl: 6e4 } }),
+      (0, swagger_1.ApiOperation)({ summary: "Update a link owned by the current user" }),
+      (0, swagger_1.ApiOkResponse)({ description: "The link was updated" }),
+      (0, swagger_1.ApiConflictResponse)({
+        description: "The requested short code is already in use"
+      }),
+      (0, swagger_1.ApiBadRequestResponse)({
+        description: "Invalid input, e.g. originalUrl is not http(s), has credentials in it, or points to a localhost/private/internal address"
+      }),
+      (0, swagger_1.ApiUnauthorizedResponse)({ description: "Missing or invalid authentication" }),
+      (0, swagger_1.ApiForbiddenResponse)({ description: "The link belongs to another user" }),
+      (0, swagger_1.ApiNotFoundResponse)({ description: "No link exists with the given linkId" }),
+      __param2(0, (0, common_1.Body)()),
+      __param2(1, (0, current_user_decorator_1.CurrentUser)()),
+      __metadata2("design:type", Function),
+      __metadata2("design:paramtypes", [dto_1.UpdateLinkDto, Object]),
+      __metadata2("design:returntype", Promise)
+    ], LinksController.prototype, "updateLink", null);
+    __decorate2([
+      (0, common_1.Delete)(":linkId"),
+      (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+      (0, throttler_1.Throttle)({ default: { limit: 20, ttl: 6e4 } }),
+      (0, swagger_1.ApiOperation)({ summary: "Soft-delete a link owned by the current user" }),
+      (0, swagger_1.ApiOkResponse)({ description: "The link was deleted" }),
+      (0, swagger_1.ApiBadRequestResponse)({ description: "Invalid linkId" }),
+      (0, swagger_1.ApiUnauthorizedResponse)({ description: "Missing or invalid authentication" }),
+      (0, swagger_1.ApiForbiddenResponse)({ description: "The link belongs to another user" }),
+      (0, swagger_1.ApiNotFoundResponse)({ description: "No link exists with the given linkId" }),
+      __param2(0, (0, common_1.Param)("linkId", common_1.ParseIntPipe)),
+      __param2(1, (0, current_user_decorator_1.CurrentUser)()),
+      __metadata2("design:type", Function),
+      __metadata2("design:paramtypes", [Number, Object]),
+      __metadata2("design:returntype", Promise)
+    ], LinksController.prototype, "deleteLink", null);
+    exports2.LinksController = LinksController = __decorate2([
+      (0, swagger_1.ApiTags)("links"),
+      (0, swagger_1.ApiBearerAuth)(),
+      (0, common_1.Controller)("api/links"),
+      __metadata2("design:paramtypes", [links_service_1.LinksService])
+    ], LinksController);
+  }
+});
+
+// dist/links/redirect.controller.js
+var require_redirect_controller = __commonJS({
+  "dist/links/redirect.controller.js"(exports2) {
+    "use strict";
+    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
+      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    var __metadata2 = exports2 && exports2.__metadata || function(k, v) {
+      if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+    };
+    var __param2 = exports2 && exports2.__param || function(paramIndex, decorator) {
+      return function(target, key) {
+        decorator(target, key, paramIndex);
+      };
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.GoRedirectController = exports2.RedirectController = void 0;
+    var common_1 = require_common();
+    var swagger_1 = require_dist15();
+    var links_service_1 = require_links_service();
+    var dto_1 = require_dto2();
+    var throttler_1 = require_dist13();
+    function headerValue(value) {
+      const first = Array.isArray(value) ? value[0] : value;
+      return first?.trim() || "unknown";
+    }
+    function visitContext(request) {
+      return {
+        ip: request.ip ?? "unknown",
+        userAgent: headerValue(request.headers["user-agent"]),
+        referer: headerValue(request.headers["referer"])
+      };
+    }
+    var RedirectController = class RedirectController {
+      linksService;
+      constructor(linksService) {
+        this.linksService = linksService;
+      }
+      async redirect(getData, request) {
+        const originalUrl = await this.linksService.visitLink(visitContext(request), getData);
+        return { url: originalUrl, statusCode: 302 };
+      }
+    };
+    exports2.RedirectController = RedirectController;
+    __decorate2([
+      (0, common_1.Get)(":shortCode"),
+      (0, common_1.Redirect)(),
+      (0, swagger_1.ApiOperation)({
+        summary: "Resolve a short code and redirect the visitor to the original URL"
+      }),
+      (0, swagger_1.ApiParam)({ name: "shortCode", example: "abc123" }),
+      (0, swagger_1.ApiFoundResponse)({ description: "Redirects (302) to the original URL" }),
+      (0, swagger_1.ApiNotFoundResponse)({ description: "No link exists for this short code" }),
+      (0, throttler_1.Throttle)({ default: { limit: 30, ttl: 6e4 } }),
+      (0, common_1.Header)("Cache-Control", "no-store"),
+      __param2(0, (0, common_1.Param)()),
+      __param2(1, (0, common_1.Req)()),
+      __metadata2("design:type", Function),
+      __metadata2("design:paramtypes", [dto_1.getLinkDto, Object]),
+      __metadata2("design:returntype", Promise)
+    ], RedirectController.prototype, "redirect", null);
+    exports2.RedirectController = RedirectController = __decorate2([
+      (0, swagger_1.ApiExcludeController)(),
+      (0, common_1.Controller)({ host: process.env.REDIRECT_HOST }),
+      __metadata2("design:paramtypes", [links_service_1.LinksService])
+    ], RedirectController);
+    var GoRedirectController = class GoRedirectController {
+      linksService;
+      constructor(linksService) {
+        this.linksService = linksService;
+      }
+      async redirect(getData, request) {
+        const originalUrl = await this.linksService.visitLink(visitContext(request), getData);
+        return { url: originalUrl, statusCode: 302 };
+      }
+    };
+    exports2.GoRedirectController = GoRedirectController;
+    __decorate2([
+      (0, common_1.Get)(":shortCode"),
+      (0, common_1.Redirect)(),
+      (0, throttler_1.Throttle)({ default: { limit: 30, ttl: 6e4 } }),
+      (0, common_1.Header)("Cache-Control", "no-store"),
+      __param2(0, (0, common_1.Param)()),
+      __param2(1, (0, common_1.Req)()),
+      __metadata2("design:type", Function),
+      __metadata2("design:paramtypes", [dto_1.getLinkDto, Object]),
+      __metadata2("design:returntype", Promise)
+    ], GoRedirectController.prototype, "redirect", null);
+    exports2.GoRedirectController = GoRedirectController = __decorate2([
+      (0, swagger_1.ApiExcludeController)(),
+      (0, common_1.Controller)("api/go"),
+      __metadata2("design:paramtypes", [links_service_1.LinksService])
+    ], GoRedirectController);
+  }
+});
+
+// dist/links/visitor-ip.middleware.js
+var require_visitor_ip_middleware = __commonJS({
+  "dist/links/visitor-ip.middleware.js"(exports2) {
+    "use strict";
+    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
+      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.VisitorIpMiddleware = void 0;
+    var common_1 = require_common();
+    var CLIENT_IP = /^[0-9a-fA-F:.]+$/;
+    var VisitorIpMiddleware = class VisitorIpMiddleware {
+      use(request, _response, next) {
+        const header = request.headers["x-kootahak-client-ip"];
+        const ip = (Array.isArray(header) ? header[0] : header)?.split(",")[0]?.trim();
+        if (ip && ip.length <= 64 && CLIENT_IP.test(ip)) {
+          request.headers["x-forwarded-for"] = ip;
+        }
+        next();
+      }
+    };
+    exports2.VisitorIpMiddleware = VisitorIpMiddleware;
+    exports2.VisitorIpMiddleware = VisitorIpMiddleware = __decorate2([
+      (0, common_1.Injectable)()
+    ], VisitorIpMiddleware);
+  }
+});
+
+// dist/short-code/short-code.module.js
+var require_short_code_module = __commonJS({
+  "dist/short-code/short-code.module.js"(exports2) {
+    "use strict";
+    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
+      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.ShortCodeModule = void 0;
+    var common_1 = require_common();
+    var short_code_service_1 = require_short_code_service();
+    var ShortCodeModule = class ShortCodeModule {
+    };
+    exports2.ShortCodeModule = ShortCodeModule;
+    exports2.ShortCodeModule = ShortCodeModule = __decorate2([
+      (0, common_1.Module)({
+        providers: [short_code_service_1.ShortCodeService],
+        exports: [short_code_service_1.ShortCodeService]
+      })
+    ], ShortCodeModule);
+  }
+});
+
+// dist/redis/redis-options.js
+var require_redis_options2 = __commonJS({
+  "dist/redis/redis-options.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getRedisOptions = getRedisOptions;
+    exports2.getBullMqConnection = getBullMqConnection;
+    function optionsFromUrl(url) {
+      const parsed = new URL(url);
+      return {
+        host: parsed.hostname,
+        port: parsed.port ? Number(parsed.port) : 6379,
+        username: decodeURIComponent(parsed.username) || void 0,
+        password: decodeURIComponent(parsed.password) || void 0,
+        ...parsed.protocol === "rediss:" ? { tls: {} } : {}
+      };
+    }
+    function getRedisOptions() {
+      const url = process.env.REDIS_URL || process.env.KV_URL;
+      if (url) {
+        return optionsFromUrl(url);
+      }
+      return {
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT)
+      };
+    }
+    function getBullMqConnection() {
+      const options = getRedisOptions();
+      return {
+        host: options.host,
+        port: options.port,
+        username: options.username,
+        password: options.password,
+        tls: options.tls,
+        maxRetriesPerRequest: null
+      };
+    }
+  }
+});
+
+// dist/redis/redis.provider.js
+var require_redis_provider = __commonJS({
+  "dist/redis/redis.provider.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.redisProvider = void 0;
+    var redis_constants_1 = require_redis_constants();
+    var redis_options_1 = require_redis_options2();
+    var ioredis_1 = require_built3();
+    exports2.redisProvider = {
+      provide: redis_constants_1.REDIS_CLIENT,
+      useFactory: () => new ioredis_1.Redis((0, redis_options_1.getRedisOptions)())
+    };
+  }
+});
+
+// dist/redis/redis.module.js
+var require_redis_module = __commonJS({
+  "dist/redis/redis.module.js"(exports2) {
+    "use strict";
+    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
+      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.RedisModule = void 0;
+    var common_1 = require_common();
+    var redis_provider_1 = require_redis_provider();
+    var redis_constants_1 = require_redis_constants();
+    var RedisModule = class RedisModule {
+    };
+    exports2.RedisModule = RedisModule;
+    exports2.RedisModule = RedisModule = __decorate2([
+      (0, common_1.Module)({
+        providers: [redis_provider_1.redisProvider],
+        exports: [redis_constants_1.REDIS_CLIENT]
+      })
+    ], RedisModule);
+  }
+});
+
+// dist/bullmq/bullMq.provider.js
+var require_bullMq_provider = __commonJS({
+  "dist/bullmq/bullMq.provider.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.bullMQProvider = void 0;
+    var redis_options_1 = require_redis_options2();
+    var bullMq_constant_1 = require_bullMq_constant();
+    var bullmq_1 = require_cjs4();
+    exports2.bullMQProvider = {
+      provide: bullMq_constant_1.VISIT_QUEUE,
+      useFactory: () => new bullmq_1.Queue("visit", {
+        connection: (0, redis_options_1.getBullMqConnection)()
+      })
+    };
   }
 });
 
@@ -186694,6 +186737,7 @@ var require_links_module = __commonJS({
     var prisma_module_1 = require_prisma_module();
     var redis_module_1 = require_redis_module();
     var bullMq_module_1 = require_bullMq_module();
+    var visits_module_1 = require_visits_module();
     var LinksModule = class LinksModule {
       configure(consumer) {
         consumer.apply(visitor_ip_middleware_1.VisitorIpMiddleware).forRoutes(redirect_controller_1.GoRedirectController);
@@ -186702,7 +186746,7 @@ var require_links_module = __commonJS({
     exports2.LinksModule = LinksModule;
     exports2.LinksModule = LinksModule = __decorate2([
       (0, common_1.Module)({
-        imports: [short_code_module_1.ShortCodeModule, prisma_module_1.PrismaModule, redis_module_1.RedisModule, bullMq_module_1.BullMqModule],
+        imports: [short_code_module_1.ShortCodeModule, prisma_module_1.PrismaModule, redis_module_1.RedisModule, bullMq_module_1.BullMqModule, visits_module_1.VisitsModule],
         controllers: [links_controller_1.LinksController, redirect_controller_1.RedirectController, redirect_controller_1.GoRedirectController],
         providers: [links_service_1.LinksService]
       })

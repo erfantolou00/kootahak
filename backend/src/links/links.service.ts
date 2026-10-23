@@ -14,6 +14,7 @@ import { Link, Prisma, User } from "../generated/prisma/client";
 import { PrismaService } from "../prismaClient/prisma.service";
 import { LINK_CACHE_TTL_SECONDS, REDIS_CLIENT } from "../redis/redis.constants";
 import { ShortCodeService } from "../short-code/short-code.service";
+import { VisitsService } from "../visits/visits.service";
 import {
   CachedLink,
   CreateLinkDto,
@@ -40,6 +41,7 @@ export class LinksService {
     @Inject(VISIT_QUEUE) private bullMQ: Queue,
     private readonly prisma: PrismaService,
     private readonly shortCodeService: ShortCodeService,
+    private readonly visitsService: VisitsService,
     private readonly logger: PinoLogger,
   ) {
     this.logger.setContext(LinksService.name);
@@ -247,10 +249,22 @@ export class LinksService {
       );
     }
 
+    const visit = { ...userRequest, ...userData };
+    let visitId: number | undefined;
+
+    try {
+      visitId = (await this.visitsService.recordVisit(visit)).id;
+    } catch (err: unknown) {
+      this.logger.error(
+        { err, shortCode: getData.shortCode },
+        "failed to record visit before redirect",
+      );
+    }
+
     this.bullMQ
       .add(
         "recordVisit",
-        { ...userRequest, ...userData },
+        { ...visit, visitId },
         {
           removeOnComplete: 100,
           removeOnFail: 100,

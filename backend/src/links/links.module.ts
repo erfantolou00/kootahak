@@ -10,9 +10,10 @@ import { ShortCodeModule } from "../short-code/short-code.module";
 import { PrismaModule } from "../prismaClient/prisma.module";
 import { RedisModule } from "../redis/redis.module";
 import { BullMqModule } from "../bullmq/bullMq.module";
+import { VisitsModule } from "../visits/visits.module";
 
 @Module({
-  imports: [ShortCodeModule, PrismaModule, RedisModule, BullMqModule],
+  imports: [ShortCodeModule, PrismaModule, RedisModule, BullMqModule, VisitsModule],
   controllers: [LinksController, RedirectController, GoRedirectController],
   providers: [LinksService],
 })
