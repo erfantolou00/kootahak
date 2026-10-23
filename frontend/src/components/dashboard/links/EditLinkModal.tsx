@@ -34,6 +34,7 @@ export default function EditLinkModal({
   onSubmit,
   isSubmitting = false,
 }: EditLinkModalProps) {
+  "use no memo";
   const {
     register,
     control,

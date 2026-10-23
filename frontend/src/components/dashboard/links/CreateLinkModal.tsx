@@ -27,6 +27,7 @@ export default function CreateLinkModal({
   onSubmit,
   isSubmitting = false,
 }: CreateLinkModalProps) {
+  "use no memo";
   const {
     register,
     handleSubmit,
