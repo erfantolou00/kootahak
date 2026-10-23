@@ -1,4 +1,4 @@
-const PRODUCTION_ORIGIN = "https://c7j.ir";
+const PRODUCTION_ORIGIN = "https://c7j.vercel.app";
 const DEVELOPMENT_ORIGIN = "http://c7j.local:8000";
 
 export function shortLinkOrigin(): string {

@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "https://kootahak.vercel.app"
+    },
+    {
+      "source": "/:shortCode",
+      "destination": "/api/redirect?code=:shortCode"
+    }
+  ]
+}

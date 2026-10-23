@@ -182754,24 +182754,30 @@ var require_redirect_controller = __commonJS({
       };
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.RedirectController = void 0;
+    exports2.GoRedirectController = exports2.RedirectController = void 0;
     var common_1 = require_common();
     var swagger_1 = require_dist15();
     var links_service_1 = require_links_service();
     var dto_1 = require_dto2();
     var throttler_1 = require_dist13();
+    function headerValue(value) {
+      const first = Array.isArray(value) ? value[0] : value;
+      return first?.trim() || "unknown";
+    }
+    function visitContext(request) {
+      return {
+        ip: request.ip ?? "unknown",
+        userAgent: headerValue(request.headers["user-agent"]),
+        referer: headerValue(request.headers["referer"])
+      };
+    }
     var RedirectController = class RedirectController {
       linksService;
       constructor(linksService) {
         this.linksService = linksService;
       }
       async redirect(getData, request) {
-        const visitContext = {
-          ip: request.ip ?? "unknown",
-          userAgent: request.headers["user-agent"] ?? "unknown",
-          referer: request.headers["referer"] ?? "unknown"
-        };
-        const originalUrl = await this.linksService.visitLink(visitContext, getData);
+        const originalUrl = await this.linksService.visitLink(visitContext(request), getData);
         return { url: originalUrl, statusCode: 302 };
       }
     };
@@ -182798,6 +182804,64 @@ var require_redirect_controller = __commonJS({
       (0, common_1.Controller)({ host: process.env.REDIRECT_HOST }),
       __metadata2("design:paramtypes", [links_service_1.LinksService])
     ], RedirectController);
+    var GoRedirectController = class GoRedirectController {
+      linksService;
+      constructor(linksService) {
+        this.linksService = linksService;
+      }
+      async redirect(getData, request) {
+        const originalUrl = await this.linksService.visitLink(visitContext(request), getData);
+        return { url: originalUrl, statusCode: 302 };
+      }
+    };
+    exports2.GoRedirectController = GoRedirectController;
+    __decorate2([
+      (0, common_1.Get)(":shortCode"),
+      (0, common_1.Redirect)(),
+      (0, throttler_1.Throttle)({ default: { limit: 30, ttl: 6e4 } }),
+      (0, common_1.Header)("Cache-Control", "no-store"),
+      __param2(0, (0, common_1.Param)()),
+      __param2(1, (0, common_1.Req)()),
+      __metadata2("design:type", Function),
+      __metadata2("design:paramtypes", [dto_1.getLinkDto, Object]),
+      __metadata2("design:returntype", Promise)
+    ], GoRedirectController.prototype, "redirect", null);
+    exports2.GoRedirectController = GoRedirectController = __decorate2([
+      (0, swagger_1.ApiExcludeController)(),
+      (0, common_1.Controller)("api/go"),
+      __metadata2("design:paramtypes", [links_service_1.LinksService])
+    ], GoRedirectController);
+  }
+});
+
+// dist/links/visitor-ip.middleware.js
+var require_visitor_ip_middleware = __commonJS({
+  "dist/links/visitor-ip.middleware.js"(exports2) {
+    "use strict";
+    var __decorate2 = exports2 && exports2.__decorate || function(decorators, target, key, desc) {
+      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.VisitorIpMiddleware = void 0;
+    var common_1 = require_common();
+    var CLIENT_IP = /^[0-9a-fA-F:.]+$/;
+    var VisitorIpMiddleware = class VisitorIpMiddleware {
+      use(request, _response, next) {
+        const header = request.headers["x-kootahak-client-ip"];
+        const ip = (Array.isArray(header) ? header[0] : header)?.split(",")[0]?.trim();
+        if (ip && ip.length <= 64 && CLIENT_IP.test(ip)) {
+          request.headers["x-forwarded-for"] = ip;
+        }
+        next();
+      }
+    };
+    exports2.VisitorIpMiddleware = VisitorIpMiddleware;
+    exports2.VisitorIpMiddleware = VisitorIpMiddleware = __decorate2([
+      (0, common_1.Injectable)()
+    ], VisitorIpMiddleware);
   }
 });
 
@@ -186625,17 +186689,21 @@ var require_links_module = __commonJS({
     var links_controller_1 = require_links_controller();
     var redirect_controller_1 = require_redirect_controller();
     var links_service_1 = require_links_service();
+    var visitor_ip_middleware_1 = require_visitor_ip_middleware();
     var short_code_module_1 = require_short_code_module();
     var prisma_module_1 = require_prisma_module();
     var redis_module_1 = require_redis_module();
     var bullMq_module_1 = require_bullMq_module();
     var LinksModule = class LinksModule {
+      configure(consumer) {
+        consumer.apply(visitor_ip_middleware_1.VisitorIpMiddleware).forRoutes(redirect_controller_1.GoRedirectController);
+      }
     };
     exports2.LinksModule = LinksModule;
     exports2.LinksModule = LinksModule = __decorate2([
       (0, common_1.Module)({
         imports: [short_code_module_1.ShortCodeModule, prisma_module_1.PrismaModule, redis_module_1.RedisModule, bullMq_module_1.BullMqModule],
-        controllers: [links_controller_1.LinksController, redirect_controller_1.RedirectController],
+        controllers: [links_controller_1.LinksController, redirect_controller_1.RedirectController, redirect_controller_1.GoRedirectController],
         providers: [links_service_1.LinksService]
       })
     ], LinksModule);
