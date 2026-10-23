@@ -1,12 +1,12 @@
+import AdvertiseForm from "@/components/dashboard/advertise/AdvertiseForm";
+
 export default function AdvertisePage() {
   return (
     <div>
-      <div className="flex items-center justify-between flex-wrap gap-y-5 mb-8">
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-y-5">
         <span className="text-token-4xl font-token-bold">ثبت تبلیغات</span>
       </div>
-      <div className="text-token-sm text-muted-foreground">
-        {/* محتوا اینجا */}
-      </div>
+      <AdvertiseForm />
     </div>
   );
 }

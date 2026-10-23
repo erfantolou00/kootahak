@@ -5,18 +5,19 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import type { ApexOptions } from "apexcharts";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useLinkAnalytics } from "@/hooks/links/use-link-analytics";
 import {
   browserLabel,
-  bucketSeries,
-  countryLabel,
+  currentJalaliWeekCount,
   deviceLabel,
   formatCount,
-  weeklyLabel,
+  namedSeries,
+  sumCounts,
 } from "@/lib/analytics/labels";
 import { shortLinkUrl } from "@/lib/links/short-url";
-import type { AnalyticsBucket } from "@/types/analytics";
+import type { LinksListResponse } from "@/types/links";
 
 const Chart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
@@ -41,7 +42,7 @@ const CHART_COLORS = [
 ];
 
 type ClickTab = "device" | "browser";
-type ViewTab = "week" | "month";
+type ViewTab = "hour" | "day" | "week";
 
 interface LinkAnalyticsPageProps {
   linkId: number;
@@ -49,8 +50,9 @@ interface LinkAnalyticsPageProps {
 
 export default function LinkAnalyticsPage({ linkId }: LinkAnalyticsPageProps) {
   const analytics = useLinkAnalytics(linkId);
+  const cachedLink = useCachedLink(linkId);
   const [clickTab, setClickTab] = useState<ClickTab>("device");
-  const [viewTab, setViewTab] = useState<ViewTab>("week");
+  const [viewTab, setViewTab] = useState<ViewTab>("hour");
 
   if (!Number.isInteger(linkId) || linkId <= 0) {
     return (
@@ -74,40 +76,37 @@ export default function LinkAnalyticsPage({ linkId }: LinkAnalyticsPageProps) {
   }
 
   const data = analytics.data;
-  const clickBuckets =
-    clickTab === "device" ? data.clicksByDevice : data.clicksByBrowser;
-  const clickLabels = bucketSeries(
-    clickBuckets,
+  const clickItems = clickTab === "device" ? data.devices : data.browsers;
+  const clickLabels = namedSeries(
+    clickItems,
     clickTab === "device" ? deviceLabel : browserLabel,
   );
-  const weeklyTotal = data.weeklyViews.reduce((sum, point) => sum + point.count, 0);
-  const monthlyTotal = data.monthlyViews.reduce(
-    (sum, point) => sum + point.count,
-    0,
-  );
-  const totalClicks = data.clicksByDevice.reduce(
-    (sum, bucket) => sum + bucket.count,
-    0,
-  );
-  const todayViews = data.weeklyViews.at(-1)?.count ?? 0;
+  const hourlyTotal = sumCounts(data.hourly);
+  const dailyTotal = sumCounts(data.daily);
+  const currentWeekTotal = currentJalaliWeekCount(data.weekly);
+  const totalClicks = sumCounts(data.devices);
+  const viewSeries =
+    viewTab === "hour" ? data.hourly : viewTab === "day" ? data.daily : data.weekly;
 
   return (
     <main className="space-y-6 p-4 sm:space-y-8 sm:p-6">
       <div className="flex flex-col gap-3">
         <BackLink />
         <div>
-          <h1 className="h2">{data.link.title}</h1>
-          <p className="mt-1 text-token-sm text-muted-foreground" dir="ltr">
-            {shortLinkUrl(data.link.shortCode).replace(/^https?:\/\//, "")}
-          </p>
+          <h1 className="h2">{cachedLink?.title ?? "آمار بازدید"}</h1>
+          {cachedLink ? (
+            <p className="mt-1 text-token-sm text-muted-foreground" dir="ltr">
+              {shortLinkUrl(cachedLink.shortCode).replace(/^https?:\/\//, "")}
+            </p>
+          ) : null}
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="کل کلیک‌ها" value={formatCount(totalClicks)} />
-        <StatCard title="بازدید امروز" value={formatCount(todayViews)} />
-        <StatCard title="بازدید ۷ روز" value={formatCount(weeklyTotal)} />
-        <StatCard title="بازدید ۱۲ ماه" value={formatCount(monthlyTotal)} />
+        <StatCard title="کل بازدید" value={formatCount(totalClicks)} />
+        <StatCard title="۲۴ ساعت اخیر" value={formatCount(hourlyTotal)} />
+        <StatCard title="ماه جاری" value={formatCount(dailyTotal)} />
+        <StatCard title="هفته جاری" value={formatCount(currentWeekTotal)} />
       </div>
 
       <section className="surface rounded-token-xl p-5 shadow-token-sm">
@@ -143,49 +142,51 @@ export default function LinkAnalyticsPage({ linkId }: LinkAnalyticsPageProps) {
           <div>
             <h2 className="h3">بازدید</h2>
             <p className="mt-1 text-token-sm text-muted-foreground">
-              {viewTab === "week"
-                ? "بازدید هفت روز گذشته"
-                : "بازدید دوازده ماه گذشته"}
+              {viewTab === "hour"
+                ? "بازدید ۲۴ ساعت گذشته"
+                : viewTab === "day"
+                  ? "بازدید روزهای ماه شمسی جاری"
+                  : "بازدید هفته‌های ماه شمسی جاری"}
             </p>
           </div>
           <ChartTabs
             value={viewTab}
             onChange={setViewTab}
             tabs={[
+              { id: "hour", label: "ساعتی" },
+              { id: "day", label: "روزانه" },
               { id: "week", label: "هفتگی" },
-              { id: "month", label: "ماهانه" },
             ]}
           />
         </div>
-        <div className="mt-4" dir="ltr">
+        <div className="mt-4 overflow-x-auto" dir="ltr">
           <ColumnChart
             chartKey={viewTab}
             name="بازدید"
-            categories={
-              viewTab === "week"
-                ? data.weeklyViews.map((point) => weeklyLabel(point.date))
-                : data.monthlyViews.map((point) => point.label)
-            }
-            series={
-              viewTab === "week"
-                ? data.weeklyViews.map((point) => point.count)
-                : data.monthlyViews.map((point) => point.count)
-            }
+            categories={viewSeries.map((point) => point.value)}
+            series={viewSeries.map((point) => point.count)}
           />
-        </div>
-      </section>
-
-      <section className="surface rounded-token-xl p-5 shadow-token-sm">
-        <h2 className="h3">کلیک بر اساس کشور</h2>
-        <p className="mt-1 text-token-sm text-muted-foreground">
-          هر ستون یک کشور از داده‌های بازدید است
-        </p>
-        <div className="mt-4 overflow-x-auto" dir="ltr">
-          <CountryChart buckets={data.clicksByCountry} />
         </div>
       </section>
     </main>
   );
+}
+
+function useCachedLink(linkId: number) {
+  const queryClient = useQueryClient();
+
+  return useMemo(() => {
+    const lists = queryClient.getQueriesData<LinksListResponse>({
+      queryKey: ["links", "list"],
+    });
+
+    for (const [, data] of lists) {
+      const match = data?.links.find((link) => link.id === linkId);
+      if (match) return match;
+    }
+
+    return undefined;
+  }, [queryClient, linkId]);
 }
 
 function DonutChart({
@@ -321,23 +322,6 @@ function ColumnChart({
   );
 }
 
-function CountryChart({ buckets }: { buckets: AnalyticsBucket[] }) {
-  const labeled = bucketSeries(buckets, countryLabel);
-  if (labeled.series.length === 0) {
-    return <EmptyChart text="هنوز کلیکی بر اساس کشور ثبت نشده" />;
-  }
-
-  return (
-    <ColumnChart
-      chartKey="country"
-      name="کلیک"
-      categories={labeled.labels}
-      series={labeled.series}
-      minColumnWidth={88}
-    />
-  );
-}
-
 function useChartTheme(): ApexOptions {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
@@ -441,10 +425,20 @@ function AnalyticsSkeleton() {
 }
 
 function errorText(error: unknown): string {
-  const status = (error as { response?: { status?: number } })?.response
-    ?.status;
-  if (status === 404) return "این لینک پیدا نشد.";
-  if (status === 403) return "به آمار این لینک دسترسی ندارید.";
-  if (status === 401) return "برای دیدن آمار باید وارد شوید.";
+  const response = (
+    error as {
+      response?: { status?: number; data?: { message?: string | string[] } };
+    }
+  )?.response;
+  const message = response?.data?.message;
+  if (
+    typeof message === "string" &&
+    message.trim() &&
+    !message.startsWith("Cannot ")
+  ) {
+    return message;
+  }
+  if (response?.status === 404) return "این لینک پیدا نشد.";
+  if (response?.status === 401) return "برای دیدن آمار باید وارد شوید.";
   return "آمار لینک بارگذاری نشد.";
 }

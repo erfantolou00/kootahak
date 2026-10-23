@@ -1,34 +1,18 @@
-export interface AnalyticsBucket {
-  key: string;
-  count: number;
-}
-
-export interface WeeklyViewPoint {
-  date: string;
-  count: number;
-}
-
-export interface MonthlyViewPoint {
-  month: string;
-  label: string;
-  count: number;
-}
-
-export interface LinkAnalyticsLink {
+export interface AnalyticsTimePoint {
   id: number;
-  title: string;
-  shortCode: string;
-  originalUrl: string;
-  isActive: boolean;
-  createdAt: string;
-  expiresAt: string | null;
+  value: string;
+  count: number;
 }
 
-export interface LinkAnalytics {
-  link: LinkAnalyticsLink;
-  clicksByDevice: AnalyticsBucket[];
-  clicksByBrowser: AnalyticsBucket[];
-  weeklyViews: WeeklyViewPoint[];
-  monthlyViews: MonthlyViewPoint[];
-  clicksByCountry: AnalyticsBucket[];
+export interface AnalyticsNamedCount {
+  name: string;
+  count: number;
+}
+
+export interface LinkAnalyticsCharts {
+  hourly: AnalyticsTimePoint[];
+  daily: AnalyticsTimePoint[];
+  weekly: AnalyticsTimePoint[];
+  browsers: AnalyticsNamedCount[];
+  devices: AnalyticsNamedCount[];
 }
